@@ -13,7 +13,7 @@ This repo is a [multi-root workspace](https://code.visualstudio.com/docs/editor/
 To run the code for any given project, you can simply navigate to the Run dialog (View > Run), select the project to run and then click run.  This will build the project's docker image and kick-off the application code as shown in the screenshots below.  Tasks are also available via the VS Code [command palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
 
 1. Select project to launch
-    - ![Launching project](/assets/launch.png | height=50)
+    - ![Launching project](/assets/launch.png){:height="36px"}
 
 2. Image builds
     - ![Building project image](/assets/build.png | height=50)
