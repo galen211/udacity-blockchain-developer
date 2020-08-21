@@ -1,12 +1,12 @@
 {
-  "name": "project_1",
+  "name": "project1",
   "version": "1.0.0",
   "description": "This project creates a Blockchain application to store data into the blocks",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node ./app.js"
   },
-  "author": "Udacity - jose.morales@udacity.com",
+  "author": "Galen Simmons - galen.simmons@gmail.com",
   "license": "ISC",
   "dependencies": {
     "bitcoinjs-lib": "^4.0.3",

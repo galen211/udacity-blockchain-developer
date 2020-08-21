@@ -1,5 +1,5 @@
 {
-  "name": "project_1",
+  "name": "project1",
   "version": "1.0.0",
   "lockfileVersion": 1,
   "requires": true,
@@ -48,9 +48,9 @@
       }
     },
     "bip32": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/bip32/-/bip32-1.0.2.tgz",
-      "integrity": "sha512-kedLYj8yvYzND+EfzeoMSlGiN7ImiRBF/MClJSZPkMfcU+OQO7ZpL5L/Yg+TunebBZIHhunstiQF//KLKSF5rg==",
+      "version": "1.0.4",
+      "resolved": "https://registry.npmjs.org/bip32/-/bip32-1.0.4.tgz",
+      "integrity": "sha512-8T21eLWylZETolyqCPgia+MNp+kY37zFr7PTFDTPObHeNi9JlfG4qGIh8WzerIJidtwoK+NsWq2I5i66YfHoIw==",
       "requires": {
         "bs58check": "^2.1.1",
         "create-hash": "^1.2.0",
@@ -74,12 +74,12 @@
       "integrity": "sha512-pef6gxZFztEhaE9RY9HmWVmiIHqCb2OyS4HPKkpc6CIiiOa3Qmuoylxc5P2EkU3w+5eTSifI9SEZC88idAIGow=="
     },
     "bitcoinjs-lib": {
-      "version": "4.0.3",
-      "resolved": "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-4.0.3.tgz",
-      "integrity": "sha512-cb5t55MYUpwQi095J+u6eyltgIU7lbhZfC6+annstncDhfH4cyctW5jmU/tac7NonZZFYH7DktWnDxUm9AWWDQ==",
+      "version": "4.0.5",
+      "resolved": "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-4.0.5.tgz",
+      "integrity": "sha512-gYs7K2hiY4Xb96J8AIF+Rx+hqbwjVlp5Zt6L6AnHOdzfe/2tODdmDxsEytnaxVCdhOUg0JnsGpl+KowBpGLxtA==",
       "requires": {
         "bech32": "^1.1.2",
-        "bip32": "^1.0.0",
+        "bip32": "^1.0.4",
         "bip66": "^1.1.0",
         "bitcoin-ops": "^1.4.0",
         "bs58check": "^2.0.0",
@@ -677,15 +677,15 @@
       "integrity": "sha512-zhSCtt8v2NDrRlPQpCNtw/heZLtfUDqxBM1udqikb/Hbk52LK4nQSwr10u77iopCW5LsyHpuXS0GnEc48mLeew=="
     },
     "tiny-secp256k1": {
-      "version": "1.0.1",
-      "resolved": "https://registry.npmjs.org/tiny-secp256k1/-/tiny-secp256k1-1.0.1.tgz",
-      "integrity": "sha512-Wz2kMPWtCI5XBftFeF3bUL8uz2+VlasniKwOkRPjvL7h1QVd9rbhrve/HWUu747kJKzVf1XHonzcdM4Ut8fvww==",
+      "version": "1.1.5",
+      "resolved": "https://registry.npmjs.org/tiny-secp256k1/-/tiny-secp256k1-1.1.5.tgz",
+      "integrity": "sha512-duE2hSLSQIpHGzmK48OgRrGTi+4OTkXLC6aa86uOYQ6LLCYZSarVKIAvEtY7MoXjoL6bOXMSerEGMzrvW4SkDw==",
       "requires": {
         "bindings": "^1.3.0",
         "bn.js": "^4.11.8",
         "create-hmac": "^1.1.7",
         "elliptic": "^6.4.0",
-        "nan": "^2.10.0"
+        "nan": "^2.13.2"
       }
     },
     "type-is": {

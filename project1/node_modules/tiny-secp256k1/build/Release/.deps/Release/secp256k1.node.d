@@ -1,0 +1,1 @@
+cmd_Release/secp256k1.node := c++ -bundle -undefined dynamic_lookup -Wl,-no_pie -Wl,-search_paths_first -mmacosx-version-min=10.7 -arch x86_64 -L./Release -stdlib=libc++  -o Release/secp256k1.node Release/obj.target/secp256k1/native/addon.o Release/obj.target/secp256k1/native/secp256k1/src/secp256k1.o -L/usr/local/lib
