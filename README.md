@@ -35,28 +35,28 @@ Each project contains a `README.md` file with further instructions to interact w
 ### Create Your Own Private Blockchain
 //TODO: complete project and summarize
 
-More information about this project is available in the project [README.md](/project1/)
+More information about this project is available in the [project folder](/project1/)
 
 ## Project 2
 ### Build CryptoStar Dapp on Ethereum
 //TODO: complete project and summarize
 
-More information about this project is available in the project [README.md](/project2/README.md)
+More information about this project is available in the [project folder](/project2/)
 
 ## Project 3
 ### Ethereum Dapp for Tracking Items through Supply Chain
 //TODO: complete project and summarize
 
-More information about this project is available in the project [README.md](/project3/README.md)
+More information about this project is available in the [project folder](/project3/)
 
 ## Project 4
 ### FlightSurety
 //TODO: complete project and summarize
 
-More information about this project is available in the project [README.md](/project4/README.md)
+More information about this project is available in the [project folder](/project4/)
 
 ## Project 5
 ### Capstone: Real Estate Marketplace
 //TODO: complete project and summarize
 
-More information about this project is available in the project [README.md](/project5/README.md)
+More information about this project is available in the [project folder](/project5/)
