@@ -21,13 +21,13 @@ This repo is a [multi-root workspace](https://code.visualstudio.com/docs/editor/
 To run the code for any given project, you can simply navigate to the Run dialog (View > Run), select the project to run and then click run.  This will build the project's docker image and kick-off the application code as shown in the screenshots below.  Tasks are also available via the VS Code [command palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
 
 1. Select project to launch
-    - ![Launching project](/assets/home/launch.png)
+![Launching project](/assets/home/launch.png)
 
 2. Image builds
-    - ![Building project image](/assets/home/build.png)
+![Building project image](/assets/home/build.png)
 
 3. Container runs
-    - ![Running project container](/assets/home/run.png)
+![Running project container](/assets/home/run.png)
 
 Each project contains a `README.md` file with further instructions to interact with project code.
 
@@ -35,18 +35,28 @@ Each project contains a `README.md` file with further instructions to interact w
 ### Create Your Own Private Blockchain
 //TODO: complete project and summarize
 
+More information about this project is available in the project [README.md](/project1/README.md)
+
 ## Project 2
 ### Build CryptoStar Dapp on Ethereum
 //TODO: complete project and summarize
+
+More information about this project is available in the project [README.md](/project2/README.md)
 
 ## Project 3
 ### Ethereum Dapp for Tracking Items through Supply Chain
 //TODO: complete project and summarize
 
+More information about this project is available in the project [README.md](/project3/README.md)
+
 ## Project 4
 ### FlightSurety
 //TODO: complete project and summarize
 
+More information about this project is available in the project [README.md](/project4/README.md)
+
 ## Project 5
 ### Capstone: Real Estate Marketplace
 //TODO: complete project and summarize
+
+More information about this project is available in the project [README.md](/project5/README.md)
