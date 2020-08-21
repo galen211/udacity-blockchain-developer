@@ -3,33 +3,55 @@
 	"tasks": [
 		{
 			"type": "docker-build",
-			"label": "docker-build",
+			"label": "docker-build: project1",
 			"platform": "node",
 			"dockerBuild": {
-				"dockerfile": "${workspaceFolder}/project1/Dockerfile",
-				"context": "${workspaceFolder}/project1",
-				"pull": true
+				"dockerfile": "${workspaceFolder}/Dockerfile",
+				"context": "${workspaceFolder}",
+				"pull": true,
+				"tag": "latest"
 			}
 		},
 		{
 			"type": "docker-run",
-			"label": "docker-run: release",
+			"label": "docker-run: project1 release",
 			"dependsOn": [
-				"docker-build"
-			],
-			"platform": "node"
-		},
-		{
-			"type": "docker-run",
-			"label": "docker-run: debug",
-			"dependsOn": [
-				"docker-build"
+				"docker-build: project1"
 			],
 			"dockerRun": {
 				"env": {
-					"DEBUG": "*",
+					"NODE_ENV": "release"
+				},
+				"ports": [
+					{
+						"containerPort": 3000,
+						"hostPort": 80
+					},
+				]
+			},
+			"platform": "node",
+			"node": {
+				"enableDebugging": false,
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: project1 debug",
+			"dependsOn": [
+				"docker-build: project1"
+			],
+			"dockerRun": {
+				"containerName": "project1-debug",
+				"env": {
+					// "DEBUG": "*",
 					"NODE_ENV": "development"
-				}
+				},
+				"ports": [
+					{
+						"containerPort": 3000,
+						"hostPort": 80
+					},
+				]
 			},
 			"node": {
 				"enableDebugging": true

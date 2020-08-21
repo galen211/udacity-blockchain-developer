@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "project1"
+		},
+		{
+			"path": "project2"
+		},
+		{
+			"path": "project3"
+		},
+		{
+			"path": "project4"
+		},
+		{
+			"path": "project5"
+		},
+		{
+			"path": "project6"
+		},
+		{
+			"path": "project7"
+		},
+		{
+			"path": "project8"
+		}
+	],
+	"settings": {
+		"docker.imageBuildContextPath": "."
+	},
+}
