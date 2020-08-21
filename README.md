@@ -35,7 +35,7 @@ Each project contains a `README.md` file with further instructions to interact w
 ### Create Your Own Private Blockchain
 //TODO: complete project and summarize
 
-More information about this project is available in the project [README.md](/project1/README.md)
+More information about this project is available in the project [README.md](/project1/)
 
 ## Project 2
 ### Build CryptoStar Dapp on Ethereum
