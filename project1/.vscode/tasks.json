@@ -48,7 +48,7 @@
 				},
 				"ports": [
 					{
-						"containerPort": 3000,
+						"containerPort": 8000,
 						"hostPort": 80
 					},
 				]

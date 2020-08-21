@@ -128,15 +128,11 @@ function fastparse (str) {
   var url = Url !== undefined
     ? new Url()
     : {}
-
   url.path = str
   url.href = str
   url.pathname = pathname
-
-  if (search !== null) {
-    url.query = query
-    url.search = search
-  }
+  url.query = query
+  url.search = search
 
   return url
 }

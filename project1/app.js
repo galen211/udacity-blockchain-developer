@@ -1,41 +1,57 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+/**
+ *                 ApplicationServer
+ *             (Do not change this code)
+ * Require Modules to setup the REST Api
+ * - `express` Express.js is a Web Framework
+ * - `morgan` Isn't required but help with debugging and logging
+ * - `body-parser` This module allows to parse the body of the post request into a JSON
+ */
+const express = require("express");
+const morgan = require("morgan");
+const bodyParser = require("body-parser");
+/**
+ * Require the Blockchain class. This allow us to have only one instance of the class.
+ */
+const BlockChain = require('./src/blockchain.js');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+class ApplicationServer {
 
-var app = express();
+	constructor() {
+		//Express application object
+		this.app = express();
+		//Blockchain class object
+		this.blockchain = new BlockChain.Blockchain();
+		//Method that initialized the express framework.
+		this.initExpress();
+		//Method that initialized middleware modules
+		this.initExpressMiddleWare();
+		//Method that initialized the controllers where you defined the endpoints
+		this.initControllers();
+		//Method that run the express application.
+		this.start();
+	}
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+	initExpress() {
+		this.app.set("port", 8000);
+	}
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+	initExpressMiddleWare() {
+		this.app.use(morgan("dev"));
+		this.app.use(bodyParser.urlencoded({extended:true}));
+		this.app.use(bodyParser.json());
+	}
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+	initControllers() {
+        require("./BlockchainController.js")(this.app, this.blockchain);
+	}
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+	start() {
+		let self = this;
+		this.app.listen(this.app.get("port"), () => {
+			console.log(`Server Listening for port: ${self.app.get("port")}`);
+		});
+	}
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+}
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
+new ApplicationServer();
