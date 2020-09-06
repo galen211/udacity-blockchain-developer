@@ -196,7 +196,7 @@ class Blockchain {
         let self = this;
         let results = [];
         return new Promise((resolve, reject) => {            
-            // mentor version:
+            // Method derived from: https://knowledge.udacity.com/questions/282668
             self.chain.forEach(async(b) => {
                 let blockData = await b.getBData();
                 if (blockData.address === address) results.push(blockData);
