@@ -124,6 +124,6 @@ The response output is a list of blocks:
             "story": "Testing submitStar 1"
         }
     },
-    ... // list of blocks with the address 1KMqKbWvnqmPivChWJx46szERVB6BwwWdN
+    // list of blocks with the address 1KMqKbWvnqmPivChWJx46szERVB6BwwWdN
 ]
 ```
