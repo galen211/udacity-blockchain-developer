@@ -20,6 +20,7 @@
 		},
 	],
 	"settings": {
-		"docker.imageBuildContextPath": "."
+		"docker.imageBuildContextPath": ".",
+		"comments.openPanel": "openOnSessionStart"
 	},
 }
