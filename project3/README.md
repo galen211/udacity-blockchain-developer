@@ -1,10 +1,10 @@
 # Ethereum Dapp for Tracking Items through Supply Chain
 
 ## Submission Information
--[ ] [UML Diagrams](#UML-Diagrams)
--[ ] [Libraries Write-up](#Libraries-Write-up)
--[ ] [IPFS Write-up](#IPFS-Write-up)
--[ ] Rinkeby Contract Address: `ADDRESS`
+- [ ] [UML Diagrams](#UML-Diagrams)
+- [ ] [Libraries Write-up](#Libraries-Write-up)
+- [ ] [IPFS Write-up](#IPFS-Write-up)
+- [ ] Rinkeby Contract Address: `ADDRESS`
 
 ## Summary
 The purpose of this project is to learn lower level components of establishing a sound web service architecture using Blockchain.  In this project, I created a dApp supply chain solution on Ethereum using smart contracts with role-based permissions to track and verify a product's authenticity.  To do this, I built the dApp in five parts:
