@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  project2:
+    image: project2
+    build: .
+    environment:
+      NODE_ENV: development
+    ports:
+      - 80
+      - 9229:9229
+    command: ["node", "--inspect=0.0.0.0:9229", "index.js"]

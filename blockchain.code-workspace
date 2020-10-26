@@ -21,6 +21,7 @@
 	],
 	"settings": {
 		"docker.imageBuildContextPath": ".",
-		"comments.openPanel": "openOnSessionStart"
+		"comments.openPanel": "openOnSessionStart",
+		"todo-tree.tree.showBadges": true
 	},
 }

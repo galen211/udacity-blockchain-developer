@@ -1,0 +1,63 @@
+version: '3.4'
+
+services:
+  project2:
+    image: project2
+    build: .
+    environment:
+      NODE_ENV: production
+    ports:
+      - 80
+  # ganachecli: simulated test rpc on dev environment
+  ganache-cli:
+    container_name: ganache-cli
+    build:
+      context: ./ganache
+    ports:
+      - 8545:8545
+# truffle-suite
+  # volumes are used here to enable hot editing :) Nice trick!
+  truffle-drizzle:
+    container_name: truffle-drizzle
+    build:
+      context: truffledrizzle
+    healthcheck:
+      test: curl -sf -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' localhost:8545
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: >
+      sh -c "truffle compile &&
+              truffle test &&
+              truffle migrate &&
+              cp -R output/contracts client/src/contracts/ &&
+              cd client &&
+              npm start"
+    ports:
+      - 3000:3000
+    tty: true
+    volumes:
+      - ./truffledrizzle/client/src:/client/src
+# truffle-suite
+  # volumes are used here to enable hot editing :) Nice trick!
+  truffle-drizzle:
+    container_name: truffle-drizzle
+    build:
+      context: truffledrizzle
+    healthcheck:
+      test: curl -sf -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' localhost:8545
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: >
+      sh -c "truffle compile &&
+              truffle test &&
+              truffle migrate &&
+              cp -R output/contracts client/src/contracts/ &&
+              cd client &&
+              npm start"
+    ports:
+      - 3000:3000
+    tty: true
+    volumes:
+      - ./truffledrizzle/client/src:/client/src      

@@ -8,7 +8,6 @@
  *  All the exposed methods should return a Promise to allow all the methods 
  *  run asynchronous.
  */
-
 const SHA256 = require('crypto-js/sha256');
 const hex2ascii = require('hex2ascii');
 
