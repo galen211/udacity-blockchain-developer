@@ -27,15 +27,15 @@ In this project, I created a private blockchain to record ownership of stars.  B
 
 More information about this project is available in the [project folder](/project1/)
 
-## Project 2 - **in progress**
+## Project 2
 ### Build CryptoStar Dapp on Ethereum
-The purpose of this project is to develop familiarity with building a decentralized app (dApp) on Ethereum.  In the course, we created `v1` of the Star Notary app which used the `ERC721` interface to declare a non-fungible token.  In this project, we extended the functionality of the Star Notary dApp by adding a name and symbol to our token and additional functionality including: (i) looking up the given name of a star given its token id, (ii) exchanging two stars between two owners, and (iii) transfering a star from one user to another user.
+The purpose of this project is to develop familiarity with building a decentralized app (dApp) on Ethereum.  In the course, I created `v1` of the Star Notary app which used the `ERC721` interface to declare a non-fungible token.  In this project, I extended the functionality of the Star Notary dApp by adding a name and symbol to our token and additional functionality including: (i) looking up the given name of a star given its token id, (ii) exchanging two stars between two owners, and (iii) transfering a star from one user to another user.
 
 More information about this project is available in the [project folder](/project2/)
 
-## Project 3 - **not started**
+## Project 3
 ### Ethereum Dapp for Tracking Items through Supply Chain
-//TODO: complete project and summarize
+In this project, I created a dApp supply chain solution on Ethereum using smart contracts with role-based permissions to track and verify a product's authenticity.  The purprose of the project is to get experience building an application end-to-end including planning, drafting and testing smart contracts, deploying the smart contracts, and creating a frontend interface with web3 functions to allow a client to interact with the smart contracts.
 
 More information about this project is available in the [project folder](/project3/)
 
