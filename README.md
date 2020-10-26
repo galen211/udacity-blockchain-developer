@@ -8,7 +8,7 @@ I'm a former bond trader and consultant who has been involved in fintech for ove
 ## Nanodegree Projects
 
 - [x] [Project 1: Create Your Own Private Blockchain](#project-1)
-- [ ] [Project 2: Build CryptoStar Dapp on Ethereum](#project-2)
+- [x] [Project 2: Build CryptoStar Dapp on Ethereum](#project-2)
 - [ ] [Project 3: Ethereum Dapp for Tracking Items through Supply Chain](#project-3)
 - [ ] [Project 4: FlightSurety](#project-4)
 - [ ] [Project 5: Real Estate Marketplace Capstone](#project-5)
@@ -29,7 +29,7 @@ More information about this project is available in the [project folder](/projec
 
 ## Project 2 - **in progress**
 ### Build CryptoStar Dapp on Ethereum
-//TODO: complete project and summarize
+The purpose of this project is to develop familiarity with building a decentralized app (dApp) on Ethereum.  In the course, we created `v1` of the Star Notary app which used the `ERC721` interface to declare a non-fungible token.  In this project, we extended the functionality of the Star Notary dApp by adding a name and symbol to our token and additional functionality including: (i) looking up the given name of a star given its token id, (ii) exchanging two stars between two owners, and (iii) transfering a star from one user to another user.
 
 More information about this project is available in the [project folder](/project2/)
 
