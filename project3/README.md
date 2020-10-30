@@ -4,7 +4,9 @@
 - [ ] [UML Diagrams](#UML-Diagrams)
 - [ ] [Libraries Write-up](#Libraries-Write-up)
 - [ ] [IPFS Write-up](#IPFS-Write-up)
-- [ ] Rinkeby Contract Address: `ADDRESS`
+- [ ] [General Write-up](#General-Write-up)
+
+The Rinkeby contract address for this project is: `ADDRESS`
 
 ## Summary
 The purpose of this project is to learn lower level components of establishing a sound web service architecture using Blockchain.  In this project, I created a dApp supply chain solution on Ethereum using smart contracts with role-based permissions to track and verify a product's authenticity.  To do this, I built the dApp in five parts:
@@ -25,10 +27,31 @@ PASTE
 Screenshots etc
 
 ### UML Diagrams
-TBD
+
+#### Activity
+
+#### Sequence
+
+#### State
+
+#### Classes (Data Model)
 
 ### Libraries Write-up
-TBD
+If libraries are used, the project write-up discusses why these libraries were adopted.
+
+"dependencies": {
+    "truffle-hdwallet-provider": "^1.0.17"
+  }
+
+- "truffle-hdwallet-provider": "^1.0.17"
+solidity-docgen
 
 ### IPFS Write-up
-TBD
+If IPFS is used, the project write-up discusses how IPFS is used in this project.
+
+### General Write-up
+A general write up exists to items like steps and contracts address.
+The Rinkeby contract address for this project is: `ADDRESS`
+
+Generate documentation 
+`npx solidity-docgen --help`
