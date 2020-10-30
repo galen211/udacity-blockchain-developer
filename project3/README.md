@@ -55,3 +55,8 @@ The Rinkeby contract address for this project is: `ADDRESS`
 
 Generate documentation 
 `npx solidity-docgen --help`
+
+gitbook-cli
+https://github.com/GitbookIO/gitbook/blob/master/docs/setup.md
+
+gitbook serve

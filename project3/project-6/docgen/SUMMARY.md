@@ -1,7 +1,7 @@
 # Summary
 
 * [Introduction](README.md)
-* contracts
+* Contracts
     * [Migrations](docs/Migrations.md)
     * coffeeaccesscontrol
         * [ConsumerRole](docs/coffeeaccesscontrol/ConsumerRole.md)
