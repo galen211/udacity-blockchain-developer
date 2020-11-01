@@ -29,13 +29,13 @@ Screenshots etc
 ### UML Diagrams
 
 #### Activity
-![Activity Diagram](images/uml/Supply Chain Activity Diagram.png)
+![Activity Diagram](images/uml/activity_diagram.png)
 
 #### Sequence
-![Sequence Diagram](images/uml/Supply Chain Sequence Diagram.png)
+![Sequence Diagram](images/uml/sequence_diagram.png)
 
 #### State
-![State Diagram](images/uml/Supply Chain State Diagram.png)
+![State Diagram](images/uml/state_diagram.png)
 
 #### Classes (Data Model)
 
