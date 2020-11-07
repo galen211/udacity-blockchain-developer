@@ -7,7 +7,7 @@
 - [x] [General Write-up](#General-Write-up)
 
 ## Summary
-The purpose of this project is to learn lower level components of establishing a sound web service architecture using Blockchain.  In this project, I created a dApp supply chain solution on Ethereum using smart contracts with role-based permissions to track and verify a product's authenticity.
+The purpose of this project is to learn lower level components of establishing a sound web service architecture using Blockchain.  In this project, I created a dApp coffee supply chain solution on Ethereum using smart contracts with role-based permissions to track and verify a product's authenticity.  The code for this project is in the `coffee/` folder.
 
 ## Testing The dApp
 Below is the output from my tests in the `test` folder.  To run the tests, simply execute `truffle test` at the command line.
@@ -52,11 +52,10 @@ As part of the project planning, I created UML activity, sequence, and state dia
 ![State Diagram](images/uml/state_diagram.png)
 
 #### Classes (Data Model)
-TBD
+![Classes Diagram](images/uml/class_diagram.png)
 
 ### Libraries Write-up
-If libraries are used, the project write-up discusses why these libraries were adopted.
-
+Below are the dependencies in my `packages.json` file:
 ```json
 "dependencies": {
     "solidity-docgen": "^0.5.7",
@@ -66,7 +65,7 @@ If libraries are used, the project write-up discusses why these libraries were a
     "web3": "^1.3.0"
   }
 ```
-
+**Why I used each library**:
 - `solidity-docgen`: I tried out using solidity docgen to generate documentation for my smart contracts.  The generated documentation is in a `gitbook` contained in the `docgen` folder.  This library might be useful for future projects as smart contract libraries can get quite complex.
 - `truffle`: truffle is a development framework for Ethereum that makes it easy to compile, test, and migrate solidity contracts to Ethereum networks.  For example, I used `truffle` to deploy my smart contracts to the `Rinkeby` test network.
 - `truffle-assertions`: the assertions library for truffle has convenience functions designed for solidity assertions inside of truffle tests.  I used the assertion syntax to test whether my contracts correctly emitted different events as expected.
@@ -87,6 +86,4 @@ I built the dApp in five parts:
 
 The Rinkeby contract address for this project is: `0xa2033443417Dd94D7dc2BEffeaD213F270558D1E`
 
-
-
-Smart contract documentation can be generated using `solidity-docgen` using `npx solidity-docgen --help`.
+Smart contract documentation can be generated using `solidity-docgen`.

@@ -1,0 +1,5 @@
+{
+  "server": {
+    "baseDir": ["./","./src", "./coffee/build/contracts"]
+  }
+}
