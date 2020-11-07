@@ -14,7 +14,7 @@ contract Ownable {
     }
 
     /// Look up the address of the owner
-    function owner() public view returns (address) {
+    function owner() public view returns (address) { // confusing, need to change identifier to compile
         return origOwner;
     }
 

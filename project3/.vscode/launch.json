@@ -1,11 +1,22 @@
 {
     "configurations": [
+
         {
             "name": "Docker Node.js Launch",
             "type": "docker",
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
             "platform": "node"
-        }
+        },
+        // {
+        //     "type": "node",
+        //     "request": "launch",
+        //     "name": "truffle test (debugable)",
+        //     "cwd": "${workspaceFolder}",
+        //     "program": "${workspaceFolder}/project-6/node_modules/truffle/build/cli.bundled.js",
+        //     "args": [
+        //         "test"
+        //     ]
+        // },
     ]
 }
