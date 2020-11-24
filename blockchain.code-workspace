@@ -22,6 +22,7 @@
 	"settings": {
 		"docker.imageBuildContextPath": ".",
 		"comments.openPanel": "openOnSessionStart",
-		"todo-tree.tree.showBadges": true
+		"todo-tree.tree.showBadges": true,
+		"git.ignoreLimitWarning": true
 	},
 }

@@ -1,0 +1,377 @@
+{
+  "contractName": "Flights",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3006080604052600080fd00a165627a7a7230582039afa045371cf27a320ec84438f3768fcae8bcf138a40957b90a6848815d12220029",
+  "deployedBytecode": "0x6080604052600080fd00a165627a7a7230582039afa045371cf27a320ec84438f3768fcae8bcf138a40957b90a6848815d12220029",
+  "sourceMap": "26:227:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:227:3;;;;;;;",
+  "deployedSourceMap": "26:227:3:-;;;;;",
+  "source": "pragma solidity ^0.4.25;\n\ncontract Flights {\n\n    struct Flight {\n        bool isRegistered;\n        uint8 statusCode;\n        uint256 updatedTimestamp;\n        address airline;\n    }\n\n    enum FlightStatus {\n        OnSchedule,\n        Delayed\n    }\n\n}",
+  "sourcePath": "/Users/galen/code/udacity/udacity-blockchain-developer/project4/contracts/Flights.sol",
+  "ast": {
+    "absolutePath": "/Users/galen/code/udacity/udacity-blockchain-developer/project4/contracts/Flights.sol",
+    "exportedSymbols": {
+      "Flights": [
+        978
+      ]
+    },
+    "id": 979,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 965,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".25"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:3"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 978,
+        "linearizedBaseContracts": [
+          978
+        ],
+        "name": "Flights",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "Flights.Flight",
+            "id": 974,
+            "members": [
+              {
+                "constant": false,
+                "id": 967,
+                "name": "isRegistered",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "74:17:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 966,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "74:4:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 969,
+                "name": "statusCode",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "101:16:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 968,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "101:5:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 971,
+                "name": "updatedTimestamp",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "127:24:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 970,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "127:7:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 973,
+                "name": "airline",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "161:15:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 972,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "161:7:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Flight",
+            "nodeType": "StructDefinition",
+            "scope": 978,
+            "src": "50:133:3",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "Flights.FlightStatus",
+            "id": 977,
+            "members": [
+              {
+                "id": 975,
+                "name": "OnSchedule",
+                "nodeType": "EnumValue",
+                "src": "217:10:3"
+              },
+              {
+                "id": 976,
+                "name": "Delayed",
+                "nodeType": "EnumValue",
+                "src": "237:7:3"
+              }
+            ],
+            "name": "FlightStatus",
+            "nodeType": "EnumDefinition",
+            "src": "189:61:3"
+          }
+        ],
+        "scope": 979,
+        "src": "26:227:3"
+      }
+    ],
+    "src": "0:253:3"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/galen/code/udacity/udacity-blockchain-developer/project4/contracts/Flights.sol",
+    "exportedSymbols": {
+      "Flights": [
+        978
+      ]
+    },
+    "id": 979,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 965,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".25"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:3"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 978,
+        "linearizedBaseContracts": [
+          978
+        ],
+        "name": "Flights",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "Flights.Flight",
+            "id": 974,
+            "members": [
+              {
+                "constant": false,
+                "id": 967,
+                "name": "isRegistered",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "74:17:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 966,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "74:4:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 969,
+                "name": "statusCode",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "101:16:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 968,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "101:5:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 971,
+                "name": "updatedTimestamp",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "127:24:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 970,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "127:7:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 973,
+                "name": "airline",
+                "nodeType": "VariableDeclaration",
+                "scope": 974,
+                "src": "161:15:3",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 972,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "161:7:3",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Flight",
+            "nodeType": "StructDefinition",
+            "scope": 978,
+            "src": "50:133:3",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "Flights.FlightStatus",
+            "id": 977,
+            "members": [
+              {
+                "id": 975,
+                "name": "OnSchedule",
+                "nodeType": "EnumValue",
+                "src": "217:10:3"
+              },
+              {
+                "id": 976,
+                "name": "Delayed",
+                "nodeType": "EnumValue",
+                "src": "237:7:3"
+              }
+            ],
+            "name": "FlightStatus",
+            "nodeType": "EnumDefinition",
+            "src": "189:61:3"
+          }
+        ],
+        "scope": 979,
+        "src": "26:227:3"
+      }
+    ],
+    "src": "0:253:3"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.26+commit.4563c3fc.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.1",
+  "updatedAt": "2020-11-21T23:08:05.035Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
