@@ -3,7 +3,7 @@
 # Udacity Blockchain Development Nanodegree
 
 ## About Me
-I'm a former bond trader and consultant who has been involved in fintech for over 10 years.  I'm interested in Blockchain use cases that enhance existing legal regimes to enable individuals and organizations to contract more ubiquitously and frictionlessly.
+I'm a former bond trader and consultant who has worked at the intersection of finance and technology for ten years.  I'm interested in use cases for blockchain that enable individuals and businesses to transact with greater efficiency, transparency, and security.
 
 ## Nanodegree Projects
 
@@ -14,12 +14,7 @@ I'm a former bond trader and consultant who has been involved in fintech for ove
 - [ ] [Project 5: Real Estate Marketplace Capstone](#project-5)
 
 ## Github Repo Structure
-This repo is a [multi-root workspace](https://code.visualstudio.com/docs/editor/multi-root-workspaces) configured in [Visual Studio Code](https://code.visualstudio.com/).  To open the workspace in VS Code, open the `blockchain.code-workspace` file.  Each root is a project folder containing a project submission to the Blockchain Developer Nanodegree.  To make it easy to maintain and debug my code, I've configured VS Code [tasks](https://code.visualstudio.com/docs/editor/tasks) and [launch](https://code.visualstudio.com/docs/editor/debugging#_launch-configurations) configurations.
-
-### Launching Projects
-To run the code for any given project, you can simply navigate to the Run dialog (View > Run), select the project to run and then click run.  This will build the project's docker image and kick-off the application code as shown in the screenshots below.  Tasks are also available via the VS Code [command palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
-
-Each project contains a `README.md` file with further instructions to interact with project code.
+This repo is a [multi-root workspace](https://code.visualstudio.com/docs/editor/multi-root-workspaces) configured in [Visual Studio Code](https://code.visualstudio.com/).  To open the workspace in VS Code, open the `blockchain.code-workspace` file.  Each root is a project folder containing a project submission to the Blockchain Developer Nanodegree.  Each project contains a `README.md` file with further instructions on running the project code.
 
 ## Project 1
 ### Create Your Own Private Blockchain
