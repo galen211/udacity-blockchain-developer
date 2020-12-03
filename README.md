@@ -1,11 +1,11 @@
-![GitHub](https://img.shields.io/github/license/galen211/udacity-blockchain-developer?style=flat-square)
+[![GitHub](https://img.shields.io/github/license/galen211/udacity-blockchain-developer?style=flat-square)](LICENSE)
 
 # Udacity Blockchain Development Nanodegree
 
 ## About Me
 I'm a former bond trader and consultant who has worked at the intersection of finance and technology for ten years.  I'm interested in use cases for blockchain that enable individuals and businesses to transact with greater efficiency, transparency, and security.  If you'd like to connect with me, feel free to follow or DM me on Twitter.
 
-![GitHub](https://img.shields.io/twitter/follow/galen211?label=Follow%20me%20on%20Twitter&style=social)
+[![Twitter Follow](https://img.shields.io/twitter/follow/galen211?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=galen211)
 
 ## Nanodegree Projects
 
