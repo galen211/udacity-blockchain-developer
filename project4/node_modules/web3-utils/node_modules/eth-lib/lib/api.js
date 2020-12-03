@@ -28,7 +28,7 @@ var Api = function Api(provider) {
       var lengthEncoded = encodeABI("uint256", Nat.fromNumber(length)).data;
       var bytesEncoded = Bytes.padRight(nextMul32, value);
       return { data: Bytes.concat(lengthEncoded, bytesEncoded), dynamic: true };
-    } else if (type === "uint256" || type === "bytes32") {
+    } else if (type === "uint256" || type === "bytes32" || type === "address") {
       return { data: Bytes.pad(32, value), dynamic: false };
     } else {
       throw "Eth-lib can't encode ABI type " + type + " yet.";
@@ -49,43 +49,42 @@ var Api = function Api(provider) {
 
   var waitTransactionReceipt = getTransactionReceipt; // TODO: implement correctly
 
-  var addTransactionDefaults = function addTransactionDefaults(tx) {
-    return (
-      // Get basic defaults
-      Promise.all([tx.chainId || send("net_version")(), tx.gasPrice || send("eth_gasPrice")(), tx.nonce || send("eth_getTransactionCount")(tx.from, "latest"), tx.value || "0x0", tx.data || "0x"])
-      // Add them to tx
-      .then(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 5),
-            chainId = _ref2[0],
-            gasPrice = _ref2[1],
-            nonce = _ref2[2],
-            value = _ref2[3],
-            data = _ref2[4];
+  var addTransactionDefaults = async function addTransactionDefaults(tx) {
+    var baseDefaults = [tx.chainId || send("net_version")(), tx.gasPrice || send("eth_gasPrice")(), tx.nonce || send("eth_getTransactionCount")(tx.from, "latest"), tx.value || "0x0", tx.data || "0x"];
 
-        return Map.merge(tx)({ chainId: Nat.fromNumber(chainId), gasPrice: gasPrice, nonce: nonce, value: value, data: data });
-      }).then(function (tx) {
-        // Add gas default by estimating
-        if (!tx.gas) {
-          var estimateTx = {};
-          estimateTx.from = tx.from;
-          if (tx.to !== "" && tx.to !== "0x") estimateTx.to = tx.to;
-          estimateTx.value = tx.value;
-          estimateTx.nonce = tx.nonce;
-          estimateTx.data = tx.data;
-          return send("eth_estimateGas")(estimateTx).then(function (usedGas) {
-            return Map.merge(tx)({ gas: Nat.div(Nat.mul(usedGas, "0x6"), "0x5") });
-          });
-        } else {
-          return Promise.resolve(tx);
-        }
-      })
-    );
+    var _ref = await Promise.all(baseDefaults),
+        _ref2 = _slicedToArray(_ref, 5),
+        chainIdNum = _ref2[0],
+        gasPrice = _ref2[1],
+        nonce = _ref2[2],
+        value = _ref2[3],
+        data = _ref2[4];
+
+    var chainId = Nat.fromNumber(chainIdNum);
+    var from = tx.from;
+    var to = tx.to === "" || tx.to === "0x" ? null : tx.to;
+    var gas = tx.gas ? tx.gas : Nat.div(Nat.mul((await send("eth_estimateGas")({
+      from: tx.from,
+      to: tx.to,
+      value: tx.value,
+      nonce: tx.nonce,
+      data: tx.data
+    })), "0x6"), "0x5");
+
+    return {
+      chainId: chainId,
+      from: from.toLowerCase(),
+      to: to.toLowerCase(),
+      gasPrice: gasPrice,
+      gas: gas,
+      nonce: nonce,
+      value: value,
+      data: data.toLowerCase()
+    };
   };
 
-  var sendTransactionWithDefaults = function sendTransactionWithDefaults(tx) {
-    return addTransactionDefaults(tx).then(function (tx) {
-      return sendTransaction(removeEmptyTo(tx));
-    });
+  var sendTransactionWithDefaults = async function sendTransactionWithDefaults(tx) {
+    return sendTransaction(removeEmptyTo((await addTransactionDefaults(tx))));
   };
 
   var callWithDefaults = function callWithDefaults(tx, block) {

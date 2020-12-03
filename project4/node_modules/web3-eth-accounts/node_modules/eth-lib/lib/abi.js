@@ -11,18 +11,18 @@
 //   payable: Bool
 // }
 
-var Bytes = require("./bytes");
-var Nat = require("./nat");
-var keccak256s = require("./hash").keccak256s;
+const Bytes = require("./bytes");
+const Nat = require("./nat");
+const keccak256s = require("./hash").keccak256s;
 
 // (type : String), JSType(type) -> {data: Bytes, dynamic: Bool}
 //   ABI-encodes a single term.
-var encode = function encode(type, value) {
+const encode = (type, value) => {
   if (type === "bytes") {
-    var length = Bytes.length(value);
-    var nextMul32 = (((length - 1) / 32 | 0) + 1) * 32;
-    var lengthEncoded = encode("uint256", Nat.fromNumber(length)).data;
-    var bytesEncoded = Bytes.padRight(nextMul32, value);
+    const length = Bytes.length(value);
+    const nextMul32 = (((length - 1) / 32 | 0) + 1) * 32;
+    const lengthEncoded = encode("uint256", Nat.fromNumber(length)).data;
+    const bytesEncoded = Bytes.padRight(nextMul32, value);
     return { data: Bytes.concat(lengthEncoded, bytesEncoded), dynamic: true };
   } else if (type === "uint256" || type === "bytes32" || type === "address") {
     return { data: Bytes.pad(32, value), dynamic: false };
@@ -33,16 +33,12 @@ var encode = function encode(type, value) {
 
 // (method : Method), [JSType(method.inputs[i].type)] -> Bytes
 //   ABI-encodes the transaction data to call a method.
-var methodData = function methodData(method, params) {
-  var methodSig = method.name + "(" + method.inputs.map(function (i) {
-    return i.type;
-  }).join(",") + ")";
-  var methodHash = keccak256s(methodSig).slice(0, 10);
-  var encodedParams = params.map(function (param, i) {
-    return encode(method.inputs[i].type, param);
-  });
+const methodData = (method, params) => {
+  const methodSig = method.name + "(" + method.inputs.map(i => i.type).join(",") + ")";
+  const methodHash = keccak256s(methodSig).slice(0, 10);
+  let encodedParams = params.map((param, i) => encode(method.inputs[i].type, param));
   var headBlock = "0x";
-  var dataBlock = "0x";
+  let dataBlock = "0x";
   for (var i = 0; i < encodedParams.length; ++i) {
     if (encodedParams[i].dynamic) {
       var dataLoc = encodedParams.length * 32 + Bytes.length(dataBlock);
@@ -56,6 +52,6 @@ var methodData = function methodData(method, params) {
 };
 
 module.exports = {
-  encode: encode,
-  methodData: methodData
+  encode,
+  methodData
 };

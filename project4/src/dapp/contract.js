@@ -156,12 +156,12 @@ export default class Contract {
     }
             
         
-        /* Could not find the correct code for listening to the emitted event
-        var payoutEvent = self.flightSuretyApp.payout();
-        payoutEvent.watch((error, result) => {
-            result /= Math.pow(10, 18); //convert from wei back to ether
-            callback(error, result)}
-            );*/
+    /* Could not find the correct code for listening to the emitted event
+    var payoutEvent = self.flightSuretyApp.payout();
+    payoutEvent.watch((error, result) => {
+    result /= Math.pow(10, 18); //convert from wei back to ether
+    callback(error, result)}
+    );*/
     
 
     withdraw(callback){

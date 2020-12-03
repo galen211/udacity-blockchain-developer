@@ -23,7 +23,7 @@
  */
 
 var errors = require('web3-core-helpers').errors;
-var XHR2 = require('xhr2-cookies').XMLHttpRequest // jshint ignore: line
+var XHR2 = require('xhr2-cookies').XMLHttpRequest; // jshint ignore: line
 var http = require('http');
 var https = require('https');
 
@@ -34,32 +34,47 @@ var https = require('https');
 var HttpProvider = function HttpProvider(host, options) {
     options = options || {};
 
-    var keepAlive =
-        (options.keepAlive === true || options.keepAlive !== false) ?
-            true :
-            false;
-    this.host = host || 'http://localhost:8545';
-    if (this.host.substring(0,5) === "https") {
-        this.httpsAgent = new https.Agent({ keepAlive: keepAlive });
-    }else{
-        this.httpAgent = new http.Agent({ keepAlive: keepAlive });
-    }
+    this.withCredentials = options.withCredentials || false;
     this.timeout = options.timeout || 0;
     this.headers = options.headers;
+    this.agent = options.agent;
     this.connected = false;
+
+    // keepAlive is true unless explicitly set to false
+    const keepAlive = options.keepAlive !== false;
+    this.host = host || 'http://localhost:8545';
+    if (!this.agent) {
+        if (this.host.substring(0,5) === "https") {
+            this.httpsAgent = new https.Agent({ keepAlive });
+        } else {
+            this.httpAgent = new http.Agent({ keepAlive });
+        }
+    }
 };
 
 HttpProvider.prototype._prepareRequest = function(){
-    var request = new XHR2();
-    request.nodejsSet({
-        httpsAgent:this.httpsAgent,
-        httpAgent:this.httpAgent
-    });
+    var request;
+
+    // the current runtime is a browser
+    if (typeof XMLHttpRequest !== 'undefined') {
+        request = new XMLHttpRequest();
+    } else {
+        request = new XHR2();
+        var agents = {httpsAgent: this.httpsAgent, httpAgent: this.httpAgent, baseUrl: this.baseUrl};
+
+        if (this.agent) {
+            agents.httpsAgent = this.agent.https;
+            agents.httpAgent = this.agent.http;
+            agents.baseUrl = this.agent.baseUrl;
+        }
+
+        request.nodejsSet(agents);
+    }
 
     request.open('POST', this.host, true);
     request.setRequestHeader('Content-Type','application/json');
-    request.timeout = this.timeout && this.timeout !== 1 ? this.timeout : 0;
-    request.withCredentials = true;
+    request.timeout = this.timeout;
+    request.withCredentials = this.withCredentials;
 
     if(this.headers) {
         this.headers.forEach(function(header) {
@@ -114,5 +129,14 @@ HttpProvider.prototype.disconnect = function () {
     //NO OP
 };
 
+/**
+ * Returns the desired boolean.
+ *
+ * @method supportsSubscriptions
+ * @returns {boolean}
+ */
+HttpProvider.prototype.supportsSubscriptions = function () {
+    return false;
+};
 
 module.exports = HttpProvider;

@@ -22,26 +22,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var HEX_CHARS = '0123456789abcdef'.split('');
-var KECCAK_PADDING = [1, 256, 65536, 16777216];
-var SHIFT = [0, 8, 16, 24];
-var RC = [1, 0, 32898, 0, 32906, 2147483648, 2147516416, 2147483648, 32907, 0, 2147483649, 0, 2147516545, 2147483648, 32777, 2147483648, 138, 0, 136, 0, 2147516425, 0, 2147483658, 0, 2147516555, 0, 139, 2147483648, 32905, 2147483648, 32771, 2147483648, 32770, 2147483648, 128, 2147483648, 32778, 0, 2147483658, 2147483648, 2147516545, 2147483648, 32896, 2147483648, 2147483649, 0, 2147516424, 2147483648];
+const HEX_CHARS = '0123456789abcdef'.split('');
+const KECCAK_PADDING = [1, 256, 65536, 16777216];
+const SHIFT = [0, 8, 16, 24];
+const RC = [1, 0, 32898, 0, 32906, 2147483648, 2147516416, 2147483648, 32907, 0, 2147483649, 0, 2147516545, 2147483648, 32777, 2147483648, 138, 0, 136, 0, 2147516425, 0, 2147483658, 0, 2147516555, 0, 139, 2147483648, 32905, 2147483648, 32771, 2147483648, 32770, 2147483648, 128, 2147483648, 32778, 0, 2147483658, 2147483648, 2147516545, 2147483648, 32896, 2147483648, 2147483649, 0, 2147516424, 2147483648];
 
-var Keccak = function Keccak(bits) {
-  return {
-    blocks: [],
-    reset: true,
-    block: 0,
-    start: 0,
-    blockCount: 1600 - (bits << 1) >> 5,
-    outputBlocks: bits >> 5,
-    s: function (s) {
-      return [].concat(s, s, s, s, s);
-    }([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-  };
-};
+const Keccak = bits => ({
+  blocks: [],
+  reset: true,
+  block: 0,
+  start: 0,
+  blockCount: 1600 - (bits << 1) >> 5,
+  outputBlocks: bits >> 5,
+  s: (s => [].concat(s, s, s, s, s))([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+});
 
-var update = function update(state, message) {
+const update = (state, message) => {
   var length = message.length,
       blocks = state.blocks,
       byteCount = state.blockCount << 2,
@@ -133,7 +129,7 @@ var update = function update(state, message) {
   return "0x" + hex;
 };
 
-var f = function f(s) {
+const f = s => {
   var h, l, n, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23, b24, b25, b26, b27, b28, b29, b30, b31, b32, b33, b34, b35, b36, b37, b38, b39, b40, b41, b42, b43, b44, b45, b46, b47, b48, b49;
 
   for (n = 0; n < 48; n += 2) {
@@ -316,19 +312,15 @@ var f = function f(s) {
   }
 };
 
-var keccak = function keccak(bits) {
-  return function (str) {
-    var msg;
-    if (str.slice(0, 2) === "0x") {
-      msg = [];
-      for (var i = 2, l = str.length; i < l; i += 2) {
-        msg.push(parseInt(str.slice(i, i + 2), 16));
-      }
-    } else {
-      msg = str;
-    }
-    return update(Keccak(bits, bits), msg);
-  };
+const keccak = bits => str => {
+  var msg;
+  if (str.slice(0, 2) === "0x") {
+    msg = [];
+    for (var i = 2, l = str.length; i < l; i += 2) msg.push(parseInt(str.slice(i, i + 2), 16));
+  } else {
+    msg = str;
+  }
+  return update(Keccak(bits, bits), msg);
 };
 
 module.exports = {

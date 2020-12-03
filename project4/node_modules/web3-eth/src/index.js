@@ -68,20 +68,161 @@ var Eth = function Eth() {
     // sets _requestmanager
     core.packageInit(this, arguments);
 
+    // overwrite package setRequestManager
+    var setRequestManager = this.setRequestManager;
+    this.setRequestManager = function (manager) {
+        setRequestManager(manager);
+
+        _this.net.setRequestManager(manager);
+        _this.personal.setRequestManager(manager);
+        _this.accounts.setRequestManager(manager);
+        _this.Contract._requestManager = _this._requestManager;
+        _this.Contract.currentProvider = _this._provider;
+
+        return true;
+    };
+
     // overwrite setProvider
     var setProvider = this.setProvider;
     this.setProvider = function () {
         setProvider.apply(_this, arguments);
-        _this.net.setProvider.apply(_this, arguments);
-        _this.personal.setProvider.apply(_this, arguments);
-        _this.accounts.setProvider.apply(_this, arguments);
-        _this.Contract.setProvider(_this.currentProvider, _this.accounts);
+
+        _this.setRequestManager(_this._requestManager);
+
+        // Set detectedAddress/lastSyncCheck back to null because the provider could be connected to a different chain now
+        _this.ens._detectedAddress = null;
+        _this.ens._lastSyncCheck = null;
     };
 
 
+    var handleRevert = false;
     var defaultAccount = null;
     var defaultBlock = 'latest';
+    var transactionBlockTimeout = 50;
+    var transactionConfirmationBlocks = 24;
+    var transactionPollingTimeout = 750;
+    var maxListenersWarningThreshold = 100;
+    var defaultChain, defaultHardfork, defaultCommon;
 
+    Object.defineProperty(this, 'handleRevert', {
+        get: function () {
+            return handleRevert;
+        },
+        set: function (val) {
+            handleRevert = val;
+
+            // also set on the Contract object
+            _this.Contract.handleRevert = handleRevert;
+
+            // update handleRevert
+            methods.forEach(function(method) {
+                method.handleRevert = handleRevert;
+            });
+        },
+        enumerable: true
+    });
+    Object.defineProperty(this, 'defaultCommon', {
+        get: function () {
+            return defaultCommon;
+        },
+        set: function (val) {
+            defaultCommon = val;
+
+            // also set on the Contract object
+            _this.Contract.defaultCommon = defaultCommon;
+
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.defaultCommon = defaultCommon;
+            });
+        },
+        enumerable: true
+    });
+    Object.defineProperty(this, 'defaultHardfork', {
+        get: function () {
+            return defaultHardfork;
+        },
+        set: function (val) {
+            defaultHardfork = val;
+
+            // also set on the Contract object
+            _this.Contract.defaultHardfork = defaultHardfork;
+
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.defaultHardfork = defaultHardfork;
+            });
+        },
+        enumerable: true
+    });
+    Object.defineProperty(this, 'defaultChain', {
+        get: function () {
+            return defaultChain;
+        },
+        set: function (val) {
+            defaultChain = val;
+
+            // also set on the Contract object
+            _this.Contract.defaultChain = defaultChain;
+
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.defaultChain = defaultChain;
+            });
+        },
+        enumerable: true
+    });
+    Object.defineProperty(this, 'transactionPollingTimeout', {
+        get: function () {
+            return transactionPollingTimeout;
+        },
+        set: function (val) {
+            transactionPollingTimeout = val;
+
+            // also set on the Contract object
+            _this.Contract.transactionPollingTimeout = transactionPollingTimeout;
+
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.transactionPollingTimeout = transactionPollingTimeout;
+            });
+        },
+        enumerable: true
+    });
+    Object.defineProperty(this, 'transactionConfirmationBlocks', {
+        get: function () {
+            return transactionConfirmationBlocks;
+        },
+        set: function (val) {
+            transactionConfirmationBlocks = val;
+
+            // also set on the Contract object
+            _this.Contract.transactionConfirmationBlocks = transactionConfirmationBlocks;
+
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.transactionConfirmationBlocks = transactionConfirmationBlocks;
+            });
+        },
+        enumerable: true
+    });
+    Object.defineProperty(this, 'transactionBlockTimeout', {
+        get: function () {
+            return transactionBlockTimeout;
+        },
+        set: function (val) {
+            transactionBlockTimeout = val;
+
+            // also set on the Contract object
+            _this.Contract.transactionBlockTimeout = transactionBlockTimeout;
+
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.transactionBlockTimeout = transactionBlockTimeout;
+            });
+        },
+        enumerable: true
+    });
     Object.defineProperty(this, 'defaultAccount', {
         get: function () {
             return defaultAccount;
@@ -123,21 +264,36 @@ var Eth = function Eth() {
         },
         enumerable: true
     });
+    Object.defineProperty(this, 'maxListenersWarningThreshold', {
+        get: function () {
+            return maxListenersWarningThreshold;
+        },
+        set: function (val) {
+            if (_this.currentProvider && _this.currentProvider.setMaxListeners){
+                maxListenersWarningThreshold = val;
+                _this.currentProvider.setMaxListeners(val);
+            }
+        },
+        enumerable: true
+    });
 
 
-    this.clearSubscriptions = _this._requestManager.clearSubscriptions;
+    this.clearSubscriptions = _this._requestManager.clearSubscriptions.bind(_this._requestManager);
 
     // add net
-    this.net = new Net(this.currentProvider);
+    this.net = new Net(this);
     // add chain detection
     this.net.getNetworkType = getNetworkType.bind(this);
 
     // add accounts
-    this.accounts = new Accounts(this.currentProvider);
+    this.accounts = new Accounts(this);
 
     // add personal
-    this.personal = new Personal(this.currentProvider);
+    this.personal = new Personal(this);
     this.personal.defaultAccount = this.defaultAccount;
+
+    // set warnings threshold
+    this.maxListenersWarningThreshold = maxListenersWarningThreshold;
 
     // create a proxy Contract type for this instance, as a Contract's provider
     // is stored as a class member rather than an instance variable. If we do
@@ -156,7 +312,7 @@ var Eth = function Eth() {
         var setProvider = self.setProvider;
         self.setProvider = function() {
           setProvider.apply(self, arguments);
-          core.packageInit(_this, [self.currentProvider]);
+          core.packageInit(_this, [self]);
         };
     };
 
@@ -173,7 +329,13 @@ var Eth = function Eth() {
     this.Contract = Contract;
     this.Contract.defaultAccount = this.defaultAccount;
     this.Contract.defaultBlock = this.defaultBlock;
-    this.Contract.setProvider(this.currentProvider, this.accounts);
+    this.Contract.transactionBlockTimeout = this.transactionBlockTimeout;
+    this.Contract.transactionConfirmationBlocks = this.transactionConfirmationBlocks;
+    this.Contract.transactionPollingTimeout = this.transactionPollingTimeout;
+    this.Contract.handleRevert = this.handleRevert;
+    this.Contract._requestManager = this._requestManager;
+    this.Contract._ethAccounts = this.accounts;
+    this.Contract.currentProvider = this._requestManager.provider;
 
     // add IBAN
     this.Iban = Iban;
@@ -314,7 +476,8 @@ var Eth = function Eth() {
             name: 'sendSignedTransaction',
             call: 'eth_sendRawTransaction',
             params: 1,
-            inputFormatter: [null]
+            inputFormatter: [null],
+            abiCoder: abi
         }),
         new Method({
             name: 'signTransaction',
@@ -326,7 +489,8 @@ var Eth = function Eth() {
             name: 'sendTransaction',
             call: 'eth_sendTransaction',
             params: 1,
-            inputFormatter: [formatter.inputTransactionFormatter]
+            inputFormatter: [formatter.inputTransactionFormatter],
+            abiCoder: abi
         }),
         new Method({
             name: 'sign',
@@ -342,7 +506,8 @@ var Eth = function Eth() {
             name: 'call',
             call: 'eth_call',
             params: 2,
-            inputFormatter: [formatter.inputCallFormatter, formatter.inputDefaultBlockNumberFormatter]
+            inputFormatter: [formatter.inputCallFormatter, formatter.inputDefaultBlockNumberFormatter],
+            abiCoder: abi
         }),
         new Method({
             name: 'estimateGas',
@@ -367,6 +532,31 @@ var Eth = function Eth() {
             params: 1,
             inputFormatter: [formatter.inputLogFormatter],
             outputFormatter: formatter.outputLogFormatter
+        }),
+        new Method({
+            name: 'getChainId',
+            call: 'eth_chainId',
+            params: 0,
+            outputFormatter: utils.hexToNumber
+        }),
+        new Method({
+            name: 'requestAccounts',
+            call: 'eth_requestAccounts',
+            params: 0,
+            outputFormatter: utils.toChecksumAddress
+        }),
+        new Method({
+            name: 'getProof',
+            call: 'eth_getProof',
+            params: 3,
+            inputFormatter: [formatter.inputAddressFormatter, formatter.inputStorageKeysFormatter, formatter.inputDefaultBlockNumberFormatter],
+            outputFormatter: formatter.outputProofFormatter
+        }),
+        new Method({
+            name: 'getPendingTransactions',
+            call: 'eth_pendingTransactions',
+            params: 0,
+            outputFormatter: formatter.outputTransactionFormatter
         }),
 
         // subscriptions
@@ -452,13 +642,18 @@ var Eth = function Eth() {
 
     methods.forEach(function(method) {
         method.attachToObject(_this);
-        method.setRequestManager(_this._requestManager, _this.accounts); // second param means is eth.accounts (necessary for wallet signing)
+        method.setRequestManager(_this._requestManager, _this.accounts); // second param is the eth.accounts module (necessary for signing transactions locally)
         method.defaultBlock = _this.defaultBlock;
         method.defaultAccount = _this.defaultAccount;
+        method.transactionBlockTimeout = _this.transactionBlockTimeout;
+        method.transactionConfirmationBlocks = _this.transactionConfirmationBlocks;
+        method.transactionPollingTimeout = _this.transactionPollingTimeout;
+        method.handleRevert = _this.handleRevert;
     });
 
 };
 
+// Adds the static givenProvider and providers property to the Eth module
 core.addProviders(Eth);
 
 

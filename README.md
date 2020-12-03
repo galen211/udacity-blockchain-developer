@@ -10,7 +10,7 @@ I'm a former bond trader and consultant who has been involved in fintech for ove
 - [x] [Project 1: Create Your Own Private Blockchain](#project-1)
 - [x] [Project 2: Build CryptoStar Dapp on Ethereum](#project-2)
 - [x] [Project 3: Ethereum Dapp for Tracking Items through Supply Chain](#project-3)
-- [ ] [Project 4: FlightSurety](#project-4)
+- [x] [Project 4: FlightSurety](#project-4)
 - [ ] [Project 5: Real Estate Marketplace Capstone](#project-5)
 
 ## Github Repo Structure
@@ -39,13 +39,13 @@ In this project, I created a dApp supply chain solution on Ethereum using smart 
 
 More information about this project is available in the [project folder](/project3/)
 
-## Project 4 - **not started**
+## Project 4
 ### FlightSurety
-//TODO: complete project and summarize
+The FlightSurety application is a dApp that enables airlines to form a consortium to register flights, receive flight status updates from mock oracles, and make payouts to passengers who have purchased flight insurance.  The dApp separates data storage concerns from application logic that make the app possible to upgrade without re-deploying the data contract.
 
 More information about this project is available in the [project folder](/project4/)
 
-## Project 5 - **not started**
+## Project 5 - **in progress**
 ### Capstone: Real Estate Marketplace
 //TODO: complete project and summarize
 

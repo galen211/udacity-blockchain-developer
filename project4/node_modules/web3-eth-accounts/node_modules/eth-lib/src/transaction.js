@@ -32,7 +32,7 @@ const addDefaults = (rpc, tx) => {
       return {
         chainId: chainId,
         from: noAddress(tx.from) ? "0x" : tx.from.toLowerCase(),
-        to: noAddress(tx.to) ? "0x" : to.toLowerCase(),
+        to: noAddress(tx.to) ? "0x" : tx.to.toLowerCase(),
         gasPrice: gasPrice,
         gas: tx.gas ? tx.gas : Nat.div(Nat.mul(gasEstimate, "0x6"), "0x5"),
         nonce: nonce,

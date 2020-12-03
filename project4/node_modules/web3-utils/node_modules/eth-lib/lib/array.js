@@ -1,40 +1,29 @@
-var generate = function generate(num, fn) {
-  var a = [];
-  for (var i = 0; i < num; ++i) {
-    a.push(fn(i));
-  }return a;
+const generate = (num, fn) => {
+  let a = [];
+  for (var i = 0; i < num; ++i) a.push(fn(i));
+  return a;
 };
 
-var replicate = function replicate(num, val) {
-  return generate(num, function () {
-    return val;
-  });
+const replicate = (num, val) => generate(num, () => val);
+
+const concat = (a, b) => a.concat(b);
+
+const flatten = a => {
+  let r = [];
+  for (let j = 0, J = a.length; j < J; ++j) for (let i = 0, I = a[j].length; i < I; ++i) r.push(a[j][i]);
+  return r;
 };
 
-var concat = function concat(a, b) {
-  return a.concat(b);
-};
-
-var flatten = function flatten(a) {
-  var r = [];
-  for (var j = 0, J = a.length; j < J; ++j) {
-    for (var i = 0, I = a[j].length; i < I; ++i) {
-      r.push(a[j][i]);
-    }
-  }return r;
-};
-
-var chunksOf = function chunksOf(n, a) {
-  var b = [];
-  for (var i = 0, l = a.length; i < l; i += n) {
-    b.push(a.slice(i, i + n));
-  }return b;
+const chunksOf = (n, a) => {
+  let b = [];
+  for (let i = 0, l = a.length; i < l; i += n) b.push(a.slice(i, i + n));
+  return b;
 };
 
 module.exports = {
-  generate: generate,
-  replicate: replicate,
-  concat: concat,
-  flatten: flatten,
-  chunksOf: chunksOf
+  generate,
+  replicate,
+  concat,
+  flatten,
+  chunksOf
 };

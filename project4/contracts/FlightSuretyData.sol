@@ -14,14 +14,6 @@ contract FlightSuretyData {
 
     mapping(address => bool) private authorizedCaller;
 
-    /********************************************************************************************/
-    /*                                       EVENT DEFINITIONS                                  */
-    /********************************************************************************************/
-
-    /**
-     * @dev Constructor
-     *      The deploying account becomes contractOwner
-     */
     constructor() public {
         contractOwner = msg.sender;
         authorizedCaller[contractOwner] = true; // add contractOwner as an authorized caller
@@ -82,20 +74,16 @@ contract FlightSuretyData {
     /********************************************************************************************/
 
     // Airlines
-    mapping (address => Airline) private airlines;
-    uint private registeredAirlines = 0;
+    mapping(address => Airline) private airlines;
+    uint256 private registeredAirlines = 0;
 
     struct Airline {
         AirlineStatus status;
         address[] votes;
-        uint funds;
+        uint256 funds;
     }
 
-    enum AirlineStatus {
-        Nominated,
-        Registered,
-        Funded
-    }
+    enum AirlineStatus {Nominated, Registered, Funded}
 
     function registeredAirlineCount()
         external
@@ -107,32 +95,61 @@ contract FlightSuretyData {
         return registeredAirlines;
     }
 
-    function isAirlineNominated(address airlineAddress) external view 
+    function numberAirlineVotes(address airlineAddress)
+        external
+        view
         requireIsOperational
         requireCallerAuthorized
-        returns (bool) {
+        returns (uint256)
+    {
+        return airlines[airlineAddress].votes.length;
+    }
+
+    function amountAirlineFunds(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireCallerAuthorized
+        returns (uint256)
+    {
+        return airlines[airlineAddress].funds;
+    }
+
+    function isAirlineNominated(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireCallerAuthorized
+        returns (bool)
+    {
         return airlines[airlineAddress].status == AirlineStatus.Nominated;
     }
 
-    function isAirlineRegistered(address airlineAddress) external view 
+    function isAirlineRegistered(address airlineAddress)
+        external
+        view
         requireIsOperational
         requireCallerAuthorized
-        returns (bool) 
+        returns (bool)
     {
         return airlines[airlineAddress].status == AirlineStatus.Registered;
     }
 
-    function isAirlineFunded(address airlineAddress) external view 
+    function isAirlineFunded(address airlineAddress)
+        external
+        view
         requireIsOperational
         requireCallerAuthorized
-        returns (bool) 
+        returns (bool)
     {
         return airlines[airlineAddress].status == AirlineStatus.Funded;
     }
 
-    function nominateAirline(address airlineAddress) external
+    function nominateAirline(address airlineAddress)
+        external
         requireIsOperational
-        requireCallerAuthorized {
+        requireCallerAuthorized
+    {
         airlines[airlineAddress] = Airline(
             AirlineStatus.Nominated, // default Nominated
             new address[](0), // no votes
@@ -172,18 +189,78 @@ contract FlightSuretyData {
         return airlines[airlineAddress].funds;
     }
 
-    // Passengers
-    /**
-     * @dev Buy insurance for a flight
-     *
-     */
+    // Flights
+    struct Flight {
+        bool isRegistered;
+        address airline;
+        string flight;
+        uint256 departureTime;
+        uint8 statusCode;
+        address[] insurees;
+    }
 
-    function buy() external payable {}
+    mapping(bytes32 => Flight) private flights;
+
+    function registerFlight(address airline,
+        string flight,
+        uint256 departureTime,
+        uint8 statusCode
+    ) external requireIsOperational requireCallerAuthorized {
+        bytes32 key = getFlightKey(airline, flight, departureTime);
+        Flight memory newFlight;
+        newFlight.isRegistered = true;
+        newFlight.airline = airline;
+        newFlight.flight = flight;
+        newFlight.departureTime = departureTime;
+        newFlight.statusCode = statusCode;
+        flights[key] = newFlight;
+    }
+
+    function updateFlightStatus(
+        uint8 statusCode,
+        bytes32 flightKey
+    ) external requireIsOperational requireCallerAuthorized {
+        flights[flightKey].statusCode = statusCode;
+    }
+
+    function isFlightRegistered(
+        bytes32 flightKey
+    ) external view requireIsOperational requireCallerAuthorized returns (bool) {
+        return flights[flightKey].isRegistered;
+    }
+
+    // Insurance contract
+    struct Insurance {
+        uint256 funds;
+        bool withdrawable;
+    }
+
+    mapping(address => Insurance) private insurance;
+
+    function buyInsurance(address passengerAddress, uint256 insuranceAmount, bytes32 flightKey) external
+        requireIsOperational
+        requireCallerAuthorized
+    {
+        flights[flightKey].insurees.push(passengerAddress);
+        Insurance memory newInsurance;
+        newInsurance.funds = insuranceAmount;
+        newInsurance.withdrawable = false;
+        insurance[passengerAddress] = newInsurance;     
+    }
 
     /**
      *  @dev Credits payouts to insurees
      */
-    function creditInsurees() external pure {}
+    function creditInsurees(bytes32 flightKey) external 
+        requireIsOperational
+        requireCallerAuthorized
+    {
+        for(uint8 i = 0; i <= flights[flightKey].insurees.length; i++) {
+            address passengerAddress = flights[flightKey].insurees[i];
+            // insurance[passengerAddress].funds *= 1.5; <- need to figure out requirement
+            insurance[passengerAddress].withdrawable = true;
+        }
+    }
 
     /**
      *  @dev Transfers eligible payout funds to insuree
@@ -203,9 +280,9 @@ contract FlightSuretyData {
     function getFlightKey(
         address airline,
         string memory flight,
-        uint256 timestamp
+        uint256 departureTime
     ) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(airline, flight, timestamp));
+        return keccak256(abi.encodePacked(airline, flight, departureTime));
     }
 
     /**

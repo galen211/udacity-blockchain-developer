@@ -169,7 +169,7 @@ var _solidityPack = function (type, value, arraySize) {
 };
 
 
-var _processSoliditySha3Args = function (arg) {
+var _processSolidityEncodePackedArgs = function (arg) {
     /*jshint maxcomplexity:false */
 
     if(_.isArray(arg)) {
@@ -233,7 +233,7 @@ var soliditySha3 = function () {
 
     var args = Array.prototype.slice.call(arguments);
 
-    var hexArgs = _.map(args, _processSoliditySha3Args);
+    var hexArgs = _.map(args, _processSolidityEncodePackedArgs);
 
     // console.log(args, hexArgs);
     // console.log('0x'+ hexArgs.join(''));
@@ -241,5 +241,35 @@ var soliditySha3 = function () {
     return utils.sha3('0x'+ hexArgs.join(''));
 };
 
+/**
+ * Hashes solidity values to a sha3 hash using keccak 256 but does return the hash of value `null` instead of `null`
+ *
+ * @method soliditySha3Raw
+ * @return {Object} the sha3
+ */
+var soliditySha3Raw = function () {
+    return utils.sha3Raw('0x'+ _.map(Array.prototype.slice.call(arguments), _processSolidityEncodePackedArgs).join(''));
+};
 
-module.exports = soliditySha3;
+/**
+ * Encode packed args to hex
+ *
+ * @method encodePacked
+ * @return {String} the hex encoded arguments
+ */
+var encodePacked = function () {
+    /*jshint maxcomplexity:false */
+
+    var args = Array.prototype.slice.call(arguments);
+
+    var hexArgs = _.map(args, _processSolidityEncodePackedArgs);
+
+    return '0x'+ hexArgs.join('').toLowerCase();
+};
+
+
+module.exports = {
+    soliditySha3: soliditySha3,
+    soliditySha3Raw: soliditySha3Raw,
+    encodePacked: encodePacked
+};

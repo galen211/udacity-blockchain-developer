@@ -1,8 +1,11 @@
 # web3-eth-ens
 
-This is a sub package of [web3.js][repo]
+[![NPM Package][npm-image]][npm-url] [![Dependency Status][deps-image]][deps-url] [![Dev Dependency Status][deps-dev-image]][deps-dev-url]
+
+This is a sub-package of [web3.js][repo].
 
 This is the contract package to be used in the `web3-eth` package.
+
 Please read the [documentation][docs] for more.
 
 ## Installation
@@ -13,31 +16,26 @@ Please read the [documentation][docs] for more.
 npm install web3-eth-ens
 ```
 
-### In the Browser
-
-Build running the following in the [web3.js][repo] repository:
-
-```bash
-npm run-script build-all
-```
-
-Then include `dist/web3-eth-ens.js` and `dist/web3-eth.js` in your html file.
-This will expose the `EthEns` object on the window object.
-
 ## Usage
 
 ```js
-    var eth = new Web3Eth(web3.currentProvider);
-    var ens = new EthEns(eth);
-    
-    ens.getAddress('ethereum.eth').then(function (result) {
-      console.log(result);
-    });
+const eth = new Web3Eth(web3.currentProvider);
+const ens = new EthEns(eth);
+
+ens.getAddress('ethereum.eth').then(function(result) {
+    console.log(result);
+});
 ```
 
+## Types
 
+All the TypeScript typings are placed in the `types` folder.
 
 [docs]: http://web3js.readthedocs.io/en/1.0/
 [repo]: https://github.com/ethereum/web3.js
-
-
+[npm-image]: https://img.shields.io/npm/v/web3-eth-ens.svg
+[npm-url]: https://npmjs.org/package/web3-eth-ens
+[deps-image]: https://david-dm.org/ethereum/web3.js/1.x/status.svg?path=packages/web3-eth-ens
+[deps-url]: https://david-dm.org/ethereum/web3.js/1.x?path=packages/web3-eth-ens
+[deps-dev-image]: https://david-dm.org/ethereum/web3.js/1.x/dev-status.svg?path=packages/web3-eth-ens
+[deps-dev-url]: https://david-dm.org/ethereum/web3.js/1.x?type=dev&path=packages/web3-eth-ens

@@ -1,11 +1,12 @@
 module.exports = {
-  Account: require("./account.js"),
-  Nat: require("./nat.js"),
-  Bytes: require("./bytes.js"),
-  Hash: require("./hash.js"),
+  account: require("./account.js"),
+  nat: require("./nat.js"),
+  bytes: require("./bytes.js"),
+  hash: require("./hash.js"),
   RLP: require("./rlp.js"),
-  Api: require("./api.js"),
-  Provider: require("./provider.js"),
-  Desubits: require("./desubits.js"),
-  Passphrase: require("./passphrase.js")
+  abi: require("./abi.js"),
+  transaction: require("./transaction.js"),
+  rpc: require("./rpc.js"),
+  desubits: require("./desubits.js"),
+  passphrase: require("./passphrase.js")
 }

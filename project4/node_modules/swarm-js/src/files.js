@@ -6,15 +6,11 @@
 const Q = require("bluebird");
 const assert = require("assert");
 const crypto = require("crypto");
-const fs = require("fs");
-const fsp = require("fs-promise");
+const fs = require("fs-extra");
 const got = require("got");
 const mkdirp = require("mkdirp-promise");
 const path = require("path");
-
-// TODO: this lib takes 0.5s to load! Must be replaced asap.
-// Perhaps just use the unix `tar` command (cross platform?)
-const targz = require("tar.gz");
+const tar = require("tar");
 
 // String -> String ~> Promise String
 //   Downloads a file from an url to a path.
@@ -69,21 +65,20 @@ const downloadAndCheck = url => path => fileHash =>
 // String -> String ~> Promise String
 //   TODO: work for zip and other types
 const extract = fromPath => toPath =>
-  targz()
-    .extract(fromPath, toPath)
+  tar.x(fromPath, toPath)
     .then(() => toPath);
 
 // String ~> Promise String
 //   Reads a file as an UTF8 string.
 //   Returns a promise containing that string.
 const readUTF8 = path =>
-  fsp.readFile (path, {encoding: "utf8"});
+  fs.readFile (path, {encoding: "utf8"});
 
 // String ~> Promise Bool
 const isDirectory = path =>
-  fsp.exists(path)
+  fs.exists(path)
     .then(assert)
-    .then(() => fsp.lstat(path))
+    .then(() => fs.lstat(path))
     .then(stats => stats.isDirectory())
     .catch(() => false);
 
@@ -94,7 +89,7 @@ const directoryTree = dirPath => {
     isDirectory(dirPath).then(isDir => {
       if (isDir) {
         const searchOnDir = dir => search (path.join(dirPath, dir));
-        return Q.all(Q.map(fsp.readdir(dirPath), searchOnDir));
+        return Q.all(Q.map(fs.readdir(dirPath), searchOnDir));
       } else {
         paths.push(dirPath);
       };
@@ -120,15 +115,15 @@ const safeDownloadArchived = url => archiveHash => fileHash => filePath => {
   const promise = Q.resolve(mkdirp(archiveDir))
     .then(() => checksum (fileHash) (filePath))
     .then(() => filePath)
-    .catch(() => fsp.exists(archiveDir)
-      .then(exists => !exists ? fsp.mkdir(archiveDir) : null)
+    .catch(() => fs.exists(archiveDir)
+      .then(exists => !exists ? fs.mkdir(archiveDir) : null)
       .then(() => download (url)(archivePath).onData(promise.onDataCallback))
       .then(() => hash("md5")(archivePath))
       .then(() => archiveHash ? checksum(archiveHash)(archivePath) : null)
       .then(() => extract (archivePath) (archiveDir))
       .then(() => search (new RegExp(fileName+"$")) (archiveDir))
-      .then(fp => fsp.rename (fp[0], filePath))
-      .then(() => fsp.unlink (archivePath))
+      .then(fp => fs.rename (fp[0], filePath))
+      .then(() => fs.unlink (archivePath))
       .then(() => fileHash ? checksum(fileHash)(filePath) : null)
       .then(() => filePath));
   promise.onDataCallback = () => {};

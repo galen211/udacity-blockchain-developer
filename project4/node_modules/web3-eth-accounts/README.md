@@ -1,8 +1,11 @@
 # web3-eth-accounts
 
-This is a sub package of [web3.js][repo]
+[![NPM Package][npm-image]][npm-url] [![Dependency Status][deps-image]][deps-url] [![Dev Dependency Status][deps-dev-image]][deps-dev-url]
 
-This is the accounts package to be used in the `web3-eth` package.
+This is a sub-package of [web3.js][repo].
+
+This is the accounts package used in the `web3-eth` package.
+
 Please read the [documentation][docs] for more.
 
 ## Installation
@@ -13,25 +16,12 @@ Please read the [documentation][docs] for more.
 npm install web3-eth-accounts
 ```
 
-### In the Browser
-
-Build running the following in the [web3.js][repo] repository:
-
-```bash
-npm run-script build-all
-```
-
-Then include `dist/web3-eth-accounts.js` in your html file.
-This will expose the `Web3EthAccounts` object on the window object.
-
-
 ## Usage
 
 ```js
-// in node.js
-var Web3EthAccounts = require('web3-eth-accounts');
+const Web3EthAccounts = require('web3-eth-accounts');
 
-var account = new Web3EthAccounts('ws://localhost:8546');
+const account = new Web3EthAccounts('ws://localhost:8546');
 account.create();
 > {
   address: '0x2c7536E3605D9C16a7a3D7b1898e529396a65c23',
@@ -42,8 +32,15 @@ account.create();
 }
 ```
 
+## Types
+
+All the TypeScript typings are placed in the `types` folder.
 
 [docs]: http://web3js.readthedocs.io/en/1.0/
 [repo]: https://github.com/ethereum/web3.js
-
-
+[npm-image]: https://img.shields.io/npm/v/web3-eth-accounts.svg
+[npm-url]: https://npmjs.org/package/web3-eth-accounts
+[deps-image]: https://david-dm.org/ethereum/web3.js/1.x/status.svg?path=packages/web3-eth-accounts
+[deps-url]: https://david-dm.org/ethereum/web3.js/1.x?path=packages/web3-eth-accounts
+[deps-dev-image]: https://david-dm.org/ethereum/web3.js/1.x/dev-status.svg?path=packages/web3-eth-accounts
+[deps-dev-url]: https://david-dm.org/ethereum/web3.js/1.x?type=dev&path=packages/web3-eth-accounts
