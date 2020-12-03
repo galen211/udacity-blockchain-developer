@@ -1,4 +1,4 @@
-[![GitHub](https://img.shields.io/github/license/galen211/udacity-blockchain-developer?style=flat-square)](LICENSE)
+[![GitHub](https://img.shields.io/github/license/galen211/udacity-blockchain-developer?style=flat-square)](LICENSE.md)
 
 # Udacity Blockchain Development Nanodegree
 
