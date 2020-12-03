@@ -1,4 +1,5 @@
 # Create Your Own Private Blockchain
+<img src="../assets/undraw/project1.svg" width="200"/>
 
 ## Purpose
 The purpose of this project is to develop familiarity with the following concepts:

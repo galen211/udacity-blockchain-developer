@@ -1,4 +1,5 @@
 # Decentralized Star Notary
+<img src="../assets/undraw/project2.svg" width="200"/>
 
 ## Submission Information
 1) Your ERC-721 Token Name: `Star Token`

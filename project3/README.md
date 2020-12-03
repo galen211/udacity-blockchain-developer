@@ -1,4 +1,5 @@
 # Ethereum Dapp for Tracking Items through Supply Chain
+<img src="../assets/undraw/project3.svg" width="200"/>
 
 ## Submission Information
 - [x] [UML Diagrams](#UML-Diagrams)
