@@ -25023,7 +25023,7 @@
             },
             {
               "indexed": false,
-              "name": "deposit",
+              "name": "amount",
               "type": "uint256"
             }
           ],
@@ -25045,7 +25045,7 @@
             },
             {
               "indexed": false,
-              "name": "timestamp",
+              "name": "departureTime",
               "type": "uint256"
             },
             {
@@ -25072,7 +25072,7 @@
             },
             {
               "indexed": false,
-              "name": "timestamp",
+              "name": "departureTime",
               "type": "uint256"
             },
             {
@@ -25104,21 +25104,83 @@
             },
             {
               "indexed": false,
-              "name": "timestamp",
+              "name": "departureTime",
               "type": "uint256"
             }
           ],
           "name": "OracleRequest",
           "type": "event"
+        },
+        "0x34151dfe5f5d2e1a6ed2a8b951d1f9935b00b4711e31a6c7972eaee3b81c1f02": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "airlineAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "flight",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "departureTime",
+              "type": "uint256"
+            }
+          ],
+          "name": "FlightRegistered",
+          "type": "event"
+        },
+        "0x4b58308df033561e43d2c0227b19bea93ae78a05df784c985482b3fb7e154610": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "passengerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "InsurancePurchased",
+          "type": "event"
+        },
+        "0x10a0c3298ce397e54f8cec71e1604c86ee0816ac02a15dd03b90202a7c52e5e2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "airlineAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "flight",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "departureTime",
+              "type": "uint256"
+            }
+          ],
+          "name": "InsurancePayout",
+          "type": "event"
         }
       },
       "links": {},
-      "address": "0xACA87dCA672Ad5C645a1e93ff3cf0C989D8E3e09",
-      "transactionHash": "0xc1691ea3707b21f5881117472c94eaf8f6c09248918c0bf3b1b211d4ff878f1c"
+      "address": "0x8Fef0EB386769884C1fa466465eFA79df38dD666",
+      "transactionHash": "0x0018d48731e727b62cdab41a1446bb397e3905f2071cd642b56d4a3e3421bf79"
     }
   },
   "schemaVersion": "3.3.2",
-  "updatedAt": "2020-12-02T15:58:33.171Z",
+  "updatedAt": "2020-12-04T19:27:39.722Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

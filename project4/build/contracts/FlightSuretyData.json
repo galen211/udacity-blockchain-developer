@@ -14743,12 +14743,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xD2CB8402C4A366CF4b38175BcaaF36873588F77D",
-      "transactionHash": "0xbddfa4c2d8b048c6519292a1be2957b4a01e8a7d2492dc4e823ab8e0ea36b10d"
+      "address": "0x0601C2CdafbDEC13bDC6FE3265ed8feD4e18469e",
+      "transactionHash": "0x05f2f11a835624522baad9f3307c91fd9df9adbcb11e9854b531b8faacb83c89"
     }
   },
   "schemaVersion": "3.3.2",
-  "updatedAt": "2020-12-02T15:58:33.197Z",
+  "updatedAt": "2020-12-04T19:27:39.741Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {
       "creditInsurees(bytes32)": {

@@ -7,13 +7,6 @@
     <title>FlightSurety</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <script>
-        function show_value(x)
-        {
-        document.getElementById("slider_value").innerHTML="You will pay: " + x +" Ether for insuring your flight.";
-        }
-    </script>
-    
 </head>
 
 <body>
@@ -30,63 +23,9 @@
 
         <div id="display-wrapper" class="top-20">
         </div>
-
-        <h2>Register Flight:</h2>
-        This should be done by the airline, but I am keeping it here for testing purposes only.
         <div class="row top-20">
-            <label class="form">Flight</label> 
-            <input type="text" id="new-flight">
-            <btn class="btn btn-primary" id="register-flight">Register</btn>
+            <label class="form">Flight</label> <input type="text" id="flight-number"> <btn class="btn btn-primary" id="submit-oracle">Submit to Oracles</btn>
         </div>
-        <hr>
-
-        <h2>Buy Insurance:</h2>
-        <div class="row top-20">
-            <label class="form">Flight</label> 
-            <!--<input type="text" id="flight-number"> -->
-            <select id = "flight-number">
-                <option value = "GF 70">GulfAir 70</option>
-                <option value = "GF 78">GulfAir 78</option>
-                <option value = "SA 30">Saudi Airlines 30</option>
-                <option value = "SA 50">Saudi Airlines 50</option>
-              </select>
-            </div>
-            <div>
-              <span id="slider_value" style="color:red;"></span>
-            </br>
-            0<input width="400" id="insurance-value" type="range" min="0" max="1" step="any" name="sld3" value="0.5" onchange="show_value(this.value);">1Ether
-            <!--0<input type="range" id="insurance-amount" min="0" max="1" step="any"></br>1 Ether-->
-            <btn class="btn btn-primary" id="buy-insurance">Buy Insurance</btn>
-            </div>
-            <hr>
-
-            <h2>Fetch Flight Status:</h2>
-            <div class="row top-20">
-                <label class="form">Flight</label> 
-                <!--<input type="text" id="flight-number"> -->
-                <select id = "flight-number-oracles">
-                    <option value = "GF 70">GulfAir 70</option>
-                    <option value = "GF 78">GulfAir 78</option>
-                    <option value = "SA 30">Saudi Airlines 30</option>
-                    <option value = "SA 50">Saudi Airlines 50</option>
-                  </select>
-                <btn class="btn btn-primary" id="submit-oracle">Submit to Oracles</btn>
-            </div>
-            <hr>
-            <h2>Claim Your Insurance Amount:</h2>
-            <div class="row top-20">
-                <label class="form">Flight</label> 
-                <!--<input type="text" id="flight-number"> -->
-                <select id = "flight-number-claim">
-                    <option value = "GF 70">GulfAir 70</option>
-                    <option value = "GF 78">GulfAir 78</option>
-                    <option value = "SA 30">Saudi Airlines 30</option>
-                    <option value = "SA 50">Saudi Airlines 50</option>
-                  </select>
-                <btn class="btn btn-primary" id="claim-insurance">Claim Insurance</btn>
-                <btn class="btn btn-primary" id="withdraw-credit">Withdraw Now</btn>
-
-            </div>
     </main>
 
 </body>
