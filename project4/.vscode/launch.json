@@ -1,14 +1,14 @@
 {
     "configurations": [
-        // {
-        //     "name": "Docker Node.js Launch",
-        //     "type": "docker",
-        //     "request": "launch",
-        //     "preLaunchTask": "docker-run: debug",
-        //     "platform": "node"
-        // }
         {
-            "name": "Project 4: Tests",
+            "name": "Run Flutter dApp (Debug)",
+            "type": "dart",
+            "request": "launch",
+            "program": "${workspaceRoot}/src/flutter_dapp/lib/main.dart",
+            "flutterMode": "debug", 
+        },
+        {
+            "name": "Run Truffle Tests",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/truffle/build/cli.bundled.js",

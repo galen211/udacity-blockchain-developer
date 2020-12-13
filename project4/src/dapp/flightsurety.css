@@ -5,7 +5,7 @@ body {
 }
 
 .container {
-    margin-top: 400px;
+    margin-top: 200px;
     background-color: #000;
     opacity: 0.9;
     color: #fff;
@@ -13,7 +13,8 @@ body {
 }
 
 .top-20 {
-    margin-top: 20px;
+    margin-top: 50px;
+    align-items: stretch;
 }
 
 h5 {
@@ -21,7 +22,7 @@ h5 {
 }
 
 section {
-    margin-bottom: 50px;
+    margin-bottom: 100px;
 }
 
 .field {
@@ -34,8 +35,8 @@ section {
 }
 
 label.form {
-    font-size: 14px;
-    margin-right: 20px;
+    font-size: 18px;
+    margin-right: 40px;
 }
 input {
     margin-right: 30px;

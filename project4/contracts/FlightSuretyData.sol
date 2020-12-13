@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 
 contract FlightSuretyData {
     using SafeMath for uint256;
@@ -227,6 +227,12 @@ contract FlightSuretyData {
         bytes32 flightKey
     ) external view requireIsOperational requireCallerAuthorized returns (bool) {
         return flights[flightKey].isRegistered;
+    }
+
+    function getFlightStatus(
+        bytes32 flightKey
+    ) external view requireIsOperational requireCallerAuthorized returns (uint8) {
+        return flights[flightKey].statusCode;
     }
 
     // Insurance contract

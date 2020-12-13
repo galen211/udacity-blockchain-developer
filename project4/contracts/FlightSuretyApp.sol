@@ -1,11 +1,6 @@
 pragma solidity ^0.4.25;
 
-// It's important to avoid vulnerabilities due to numeric overflow bugs
-// OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
-// More info: https://www.nccgroup.trust/us/about-us/newsroom-and-events/blog/2018/november/smart-contract-insecurity-bad-arithmetic/
-
-import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
-// Data contract import
+import "./SafeMath.sol";
 import "./FlightSuretyData.sol";
 
 /************************************************** */
@@ -128,6 +123,14 @@ contract FlightSuretyApp {
         return flightData.isAirlineRegistered(airlineAddress);
     }
 
+    function isAirlineFunded(address airlineAddress)
+        public
+        view
+        returns (bool)
+    {
+        return flightData.isAirlineFunded(airlineAddress);
+    }
+
     function registerAirline(address airlineAddress)
         external
         requireFundedAirlineCaller
@@ -163,6 +166,7 @@ contract FlightSuretyApp {
     }
 
     function fundAirline() external payable requireRegisteredAirlineCaller {
+        require(msg.value >= 10 ether, "At least 10 ether in funding is required");
         flightData.fundAirline(msg.sender, msg.value);
         emit AirlineFunded(msg.sender, msg.value);
     }
@@ -207,6 +211,14 @@ contract FlightSuretyApp {
         );
         emit FlightRegistered(msg.sender, flight, departureTime);
     }
+
+    function officialFlightStatus(address airline, string flightName, uint256 departureTime)
+        public returns(uint8)
+    {   
+        bytes32 flightKey = getFlightKey(airline, flightName, departureTime);
+        return flightData.getFlightStatus(flightKey);
+    }
+    
 
     function processFlightStatus(
         address airline,
@@ -275,6 +287,10 @@ contract FlightSuretyApp {
 
     // Track all registered oracles
     mapping(address => Oracle) private oracles;
+
+    function isOracleRegistered(address oracleAddress) public view returns (bool) {
+        return oracles[oracleAddress].isRegistered;
+    }
 
     // Model for responses from oracles
     struct ResponseInfo {

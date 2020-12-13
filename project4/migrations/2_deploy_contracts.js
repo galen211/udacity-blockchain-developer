@@ -33,4 +33,14 @@ module.exports = async (deployer, network, accounts) => {
 
     fs.writeFileSync(__dirname + '/../src/dapp/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
     fs.writeFileSync(__dirname + '/../src/server/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
+    fs.writeFileSync(__dirname + '/../src/flutter_dapp/assets/contracts/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
+
+    // copy build outputs to Futter dApp
+    // var buildFolder = __dirname + '/../build/contracts/';
+    // var destFolder = __dirname + '/../src/flutter_dapp/assets/contracts/';
+
+    // fs.copyFileSync(buildFolder + 'FlightSuretyApp.json', destFolder + 'FlightSuretyApp.json');
+    // fs.copyFileSync(buildFolder + 'FlightSuretyData.json', destFolder + 'FlightSuretyData.json');
+    // fs.copyFileSync(buildFolder + 'Migrations.json', destFolder + 'Migrations.json');
+    // fs.copyFileSync(buildFolder + 'SafeMath.json', destFolder + 'SafeMath.json');
 }
