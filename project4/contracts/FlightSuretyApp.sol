@@ -24,7 +24,7 @@ contract FlightSuretyApp {
     uint8 private constant CONSENSUS_THRESHOLD = 4; // consensus active when at least four airlines registered
     uint8 private constant VOTE_SUCCESS_THRESHOLD = 2; // i.e. votes / 2
 
-    address private contractOwner; // Account used to deploy contract
+    address public contractOwner; // Account used to deploy contract
     FlightSuretyData flightData;
 
     /********************************************************************************************/
@@ -72,6 +72,10 @@ contract FlightSuretyApp {
 
     function isOperational() public view returns (bool) {
         return flightData.isOperational(); // Modify to call data contract's status
+    }
+
+    function setOperationalStatus(bool mode) public requireContractOwner returns(bool) {
+        return flightData.setOperationalStatus(mode);
     }
 
     /********************************************************************************************/

@@ -13,17 +13,18 @@ class FlightSuretyTheme {
     _theme = _buildFlightSuretyTheme();
   }
 
-//  final ThemeData _kShrineTheme = _buildShrineTheme();
-
   ThemeData _buildFlightSuretyTheme() {
-    final ThemeData base = ThemeData.light();
+    final ThemeData base = ThemeData.dark();
     return base.copyWith(
       accentColor: kAccentColor,
       primaryColor: kPrimaryColor,
       buttonColor: kButtonColor,
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: kAccentColor,
+        behavior: SnackBarBehavior.floating,
+      ),
       scaffoldBackgroundColor: kScaffoldBackgroundColor,
       cardColor: kCardColor,
-      textSelectionColor: kTextSelectionColor,
       errorColor: kErrorColor,
       buttonTheme: base.buttonTheme.copyWith(
         buttonColor: kPrimaryColor,
@@ -38,9 +39,10 @@ class FlightSuretyTheme {
       inputDecorationTheme: InputDecorationTheme(
         border: CornersBorder(),
       ),
-      textTheme: GoogleFonts.muliTextTheme(),
-      primaryTextTheme: GoogleFonts.playfairDisplayTextTheme(),
-      accentTextTheme: GoogleFonts.nunitoSansTextTheme(),
+      textTheme: GoogleFonts.muliTextTheme(ThemeData.dark().textTheme),
+      primaryTextTheme: GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme),
+      accentTextTheme:
+          GoogleFonts.nunitoSansTextTheme(ThemeData.dark().textTheme),
     );
   }
 }

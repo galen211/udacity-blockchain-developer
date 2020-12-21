@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dapp/components/transaction_status.dart';
 import 'package:flutter_dapp/components/wallet_status.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
+import 'package:flutter_dapp/contract/account_store.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,7 +29,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<ContractStore>(context);
+    final store = Provider.of<AccountStore>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -86,7 +86,7 @@ class _MainPageState extends State<MainPage> {
             store.selectPage(index);
           });
         },
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

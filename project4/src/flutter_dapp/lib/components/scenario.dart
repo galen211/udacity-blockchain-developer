@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dapp/contract/contract_store.dart';
+import 'package:provider/provider.dart';
 
 class SetupPage extends StatefulWidget {
   @override
@@ -8,6 +10,8 @@ class SetupPage extends StatefulWidget {
 class _SetupPageState extends State<SetupPage> {
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<ContractStore>(context);
+
     return Container(
       decoration: BoxDecoration(color: Colors.black87),
       child: Padding(
@@ -32,7 +36,7 @@ class _SetupPageState extends State<SetupPage> {
               ),
               readOnly: true,
               controller: TextEditingController.fromValue(
-                TextEditingValue(text: '0xFA908234lkjj23lkj243'),
+                TextEditingValue(text: store.appContractAddress.hex),
               ),
             ),
             TextFormField(
@@ -47,7 +51,7 @@ class _SetupPageState extends State<SetupPage> {
               ),
               readOnly: true,
               controller: TextEditingController.fromValue(
-                TextEditingValue(text: '0xFA908234lkjj23lkj243'),
+                TextEditingValue(text: store.dataContractAddress.hex),
               ),
             ),
             ButtonBar(

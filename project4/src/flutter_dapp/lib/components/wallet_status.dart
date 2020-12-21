@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
+import 'package:flutter_dapp/contract/account_store.dart';
+import 'package:flutter_dapp/data/actor.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +11,7 @@ class WalletStatus extends StatefulWidget {
 
 class _WalletStatusState extends State<WalletStatus> {
   Future<void> _showMyDialog() async {
-    final store = Provider.of<ContractStore>(context, listen: false);
+    final store = Provider.of<AccountStore>(context, listen: false);
 
     return showDialog<void>(
       context: context,
@@ -21,15 +22,16 @@ class _WalletStatusState extends State<WalletStatus> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('You are connected to MetaMask'),
-                Text('Your account address is: ${store.connectedAccount}'),
-                Text(
-                    'The app contract address is : ${store.appContractAddress}'),
-                Text('Your available accounts are: ${store.metamaskAccounts}'),
-                Text(
-                    'Your account balance is: ${store.accountBalance} ETH'), // could add copy to clipboard
-                Text(
-                    'To change your wallet, please use Metamask to select a different account'),
+                DropdownButtonFormField<Actor>(
+                  hint: Text("Choose an account to use"),
+                  isDense: true,
+                  isExpanded: true,
+                  value: store.selectedActor,
+                  items: store.accountsDropdown(),
+                  onChanged: (value) {
+                    store.selectAccount(value);
+                  },
+                ),
               ],
             ),
           ),
@@ -38,6 +40,12 @@ class _WalletStatusState extends State<WalletStatus> {
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
+                final snackBar = SnackBar(
+                  content: Text(
+                      'You are now transacting as ${store.actorName()} at address: ${store.selectedActor.address.hex}'),
+                  duration: Duration(seconds: 3),
+                );
+                ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
               },
             ),
           ],
@@ -48,7 +56,7 @@ class _WalletStatusState extends State<WalletStatus> {
 
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<ContractStore>(context);
+    final store = Provider.of<AccountStore>(context);
     return Observer(builder: (context) {
       return Container(
         child: Row(
@@ -61,9 +69,7 @@ class _WalletStatusState extends State<WalletStatus> {
                 size: 15,
               ),
               onPressed: () {
-                store.isAccountConnected
-                    ? _showMyDialog()
-                    : store.connectMetamask();
+                _showMyDialog();
               },
             ),
           ],

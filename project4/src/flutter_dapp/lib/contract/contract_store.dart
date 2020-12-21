@@ -1,14 +1,14 @@
-import 'package:carousel_slider/carousel_controller.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'dart:collection';
+
+import 'package:flutter_dapp/contract/account_store.dart';
 import 'package:flutter_dapp/contract/contract_service.dart';
 import 'package:flutter_dapp/contract/flight.dart';
+import 'package:flutter_dapp/contract/prerequisites.dart';
+import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/events.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
-import 'package:flutter_web3_provider/ethereum.dart';
-import 'package:flutter_web3_provider/ethers.dart';
-import 'package:flutter_web3_provider/flutter_web3_provider.dart';
 import 'package:mobx/mobx.dart';
-import 'dart:js_util';
+import 'package:web3dart/web3dart.dart';
 
 part 'contract_store.g.dart';
 
@@ -17,27 +17,27 @@ final App appConstants = App.settings;
 class ContractStore = _ContractStore with _$ContractStore;
 
 abstract class _ContractStore with Store {
-  Web3Provider web3;
-  ContractService service;
+  final accountStore = AccountStore();
+  ContractService contracts;
+  Prerequisites prerequisites;
+
+  DeployedContract appContract;
+  EthereumAddress appContractAddress;
+
+  DeployedContract dataContract;
+  EthereumAddress dataContractAddress;
+
+  Map<String, ContractFunction> contractFunctions;
+  Queue<FlightSuretyEvent> contractEvents;
 
   _ContractStore() {
-    //connectMetamask(); -> missing provider error
-    service = ContractService();
-  }
-
-  @observable
-  CarouselController carouselController = CarouselController();
-
-  @observable
-  int selectedPageIndex = 0;
-
-  @action
-  void selectPage(int index) {
-    selectedPageIndex = index;
-    carouselController.animateToPage(
-      selectedPageIndex,
-      duration: Duration(milliseconds: 500),
-    );
+    prerequisites = Prerequisites();
+    appContract = prerequisites.appContract;
+    appContractAddress = prerequisites.appContractAddress;
+    dataContract = prerequisites.dataContract;
+    dataContractAddress = prerequisites.dataContractAddress;
+    contractFunctions = prerequisites.contractFunctions;
+    contracts = ContractService();
   }
 
   @observable
@@ -48,35 +48,10 @@ abstract class _ContractStore with Store {
       ObservableList<String>(); // could try substring highlight for log text
 
   @observable
-  String chainId;
-
-  @observable
-  String appContractAddress;
-
-  @observable
-  String connectedAccount;
-
-  @observable
-  double connectedAccountBalanceEth;
-
-  @observable
-  String selectedAddress;
-
-  @observable
-  double selectedAccountWithdrawableBalanceEth;
-
-  @observable
-  List<dynamic> metamaskAccounts;
-
-  @observable
   var accountBalance;
 
   @observable
   bool isAccountConnected = false;
-
-  @computed
-  String get statusDescription =>
-      isAccountConnected ? '$connectedAccount' : 'Wallet Not Connected';
 
   @observable
   bool isAppContractOperational;
@@ -96,8 +71,11 @@ abstract class _ContractStore with Store {
   @observable
   FlightStatus selectedFlightStatus;
 
-  @computed
-  Actor get connectedAccountActor => addressActors[connectedAccount];
+  @action
+  Future<bool> isContractOperational() async {
+    // List< status =
+    //     await contracts.isOperational(accountStore.selectedActor.address);
+  }
 
   @action
   void setPendingStatus(bool status) {
@@ -105,9 +83,15 @@ abstract class _ContractStore with Store {
   }
 
   @action
+  Future<void> toggleOperationalStatus() {}
+
+  @action
+  Future<void> setOperatingStatus() {}
+
+  @action
   Future<void> registerAirline(String address) async {
-    final proceed = await warnNot(Actor.Airline);
-    if (!proceed) return transactionCancelled();
+    // final proceed = await warnNot(Actor.actorType.Airline);
+    // if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     try {
       //await service.registerAirline(address);
@@ -117,8 +101,8 @@ abstract class _ContractStore with Store {
 
   @action
   Future<void> fundAirline(double amountEth) async {
-    final proceed = await warnNot(Actor.Airline);
-    if (!proceed) return transactionCancelled();
+    //final proceed = await warnNot(Actor.Airline);
+    //if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     try {
       //await service.fundAirline(amountEth);
@@ -128,8 +112,8 @@ abstract class _ContractStore with Store {
 
   @action
   Future<void> registerFlight(Flight flight) async {
-    final proceed = await warnNot(Actor.Airline);
-    if (!proceed) return transactionCancelled();
+    //final proceed = await warnNot(Actor.Airline);
+    //if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     try {
       //await service.registerFlight(flight);
@@ -139,8 +123,8 @@ abstract class _ContractStore with Store {
 
   @action
   Future<void> purchaseInsurance(double amountEth) async {
-    final proceed = await warnNot(Actor.Passenger);
-    if (!proceed) return transactionCancelled();
+    // //final proceed = await warnNot(Actor.Passenger);
+    // if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     try {
       //await service.purchaseInsurance(amountEth);
@@ -161,8 +145,8 @@ abstract class _ContractStore with Store {
 
   @action
   Future<void> checkFlightStatus() async {
-    final proceed = await warnNot(Actor.Passenger);
-    if (!proceed) return transactionCancelled();
+    // final proceed = await warnNot(Actor.Passenger);
+    // if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     try {
       //selectedFlightStatus = await service.checkFlightStatus(selectedFlight);
@@ -172,8 +156,8 @@ abstract class _ContractStore with Store {
 
   @action
   Future<void> queryAvailableBalance() async {
-    final proceed = await warnNot(Actor.Passenger);
-    if (!proceed) return transactionCancelled();
+    // final proceed = await warnNot(Actor.Passenger);
+    // if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     //selectedAccountWithdrawableBalanceEth =
     //    await service.queryAvailableBalance(selectedAddress);
@@ -182,47 +166,32 @@ abstract class _ContractStore with Store {
 
   @action
   Future<void> withdrawAvailableBalance() async {
-    final proceed = await warnNot(Actor.Passenger);
-    if (!proceed) return transactionCancelled();
+    // final proceed = await warnNot(Actor.Passenger);
+    // if (!proceed) return transactionCancelled();
     isTransactionPending = true;
     try {
-      await service.withdrawAvailableBalance();
+      await contracts.withdrawAvailableBalance();
     } catch (e) {}
     isTransactionPending = false;
   }
 
-  void connectMetamask() async {
-    try {
-      web3 = getWeb3Provider();
-      ethereum.autoRefreshOnNetworkChange = true;
-      final Future<List<dynamic>> accountsFuture = promiseToFuture(
-          ethereum.request(RequestParams(method: 'eth_requestAccounts')));
-      metamaskAccounts = await accountsFuture;
-      connectedAccount = ethereum.selectedAddress;
-      final Future<dynamic> accountBalanceFuture =
-          promiseToFuture(web3.getBalance(connectedAccount));
-      accountBalance = await accountBalanceFuture;
-      isAccountConnected = true;
-    } on Exception catch (e) {
-      debugPrint('Unable to get accounts from MetaMask: $e');
-      return;
-    }
-  }
+  @action
+  Future<void> selectAccount() {}
 
   void transactionCancelled() {
     //
   }
 
-  void initializeContract() {
-    appContractAddress = '';
-  }
+  // void initializeContract() {
+  //   appContractAddress = '';
+  // }
 
-  Future<bool> warnNot(Actor expectedActor) async {
-    if (connectedAccountActor != expectedActor) {
-      // require confirmSelection
-    }
-    return Future.value(true); // can proceed
-  }
+  // Future<bool> warnNot(Actor expectedActor) async {
+  //   if (connectedAccountActor != expectedActor) {
+  //     // require confirmSelection
+  //   }
+  //   return Future.value(true); // can proceed
+  // }
 
   Future confirmSelection() {}
 }

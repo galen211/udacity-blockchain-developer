@@ -49,8 +49,9 @@ contract FlightSuretyData {
         return operational;
     }
 
-    function setOperatingStatus(bool mode) external requireContractOwner {
+    function setOperationalStatus(bool mode) external requireContractOwner returns(bool) {
         operational = mode;
+        return operational;
     }
 
     function authorizeCaller(address _address)

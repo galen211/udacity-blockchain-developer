@@ -9,53 +9,6 @@ part of 'contract_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ContractStore on _ContractStore, Store {
-  Computed<String> _$statusDescriptionComputed;
-
-  @override
-  String get statusDescription => (_$statusDescriptionComputed ??=
-          Computed<String>(() => super.statusDescription,
-              name: '_ContractStore.statusDescription'))
-      .value;
-  Computed<Actor> _$connectedAccountActorComputed;
-
-  @override
-  Actor get connectedAccountActor => (_$connectedAccountActorComputed ??=
-          Computed<Actor>(() => super.connectedAccountActor,
-              name: '_ContractStore.connectedAccountActor'))
-      .value;
-
-  final _$carouselControllerAtom =
-      Atom(name: '_ContractStore.carouselController');
-
-  @override
-  CarouselController get carouselController {
-    _$carouselControllerAtom.reportRead();
-    return super.carouselController;
-  }
-
-  @override
-  set carouselController(CarouselController value) {
-    _$carouselControllerAtom.reportWrite(value, super.carouselController, () {
-      super.carouselController = value;
-    });
-  }
-
-  final _$selectedPageIndexAtom =
-      Atom(name: '_ContractStore.selectedPageIndex');
-
-  @override
-  int get selectedPageIndex {
-    _$selectedPageIndexAtom.reportRead();
-    return super.selectedPageIndex;
-  }
-
-  @override
-  set selectedPageIndex(int value) {
-    _$selectedPageIndexAtom.reportWrite(value, super.selectedPageIndex, () {
-      super.selectedPageIndex = value;
-    });
-  }
-
   final _$isTransactionPendingAtom =
       Atom(name: '_ContractStore.isTransactionPending');
 
@@ -87,116 +40,6 @@ mixin _$ContractStore on _ContractStore, Store {
     _$sessionTransactionHistoryAtom
         .reportWrite(value, super.sessionTransactionHistory, () {
       super.sessionTransactionHistory = value;
-    });
-  }
-
-  final _$chainIdAtom = Atom(name: '_ContractStore.chainId');
-
-  @override
-  String get chainId {
-    _$chainIdAtom.reportRead();
-    return super.chainId;
-  }
-
-  @override
-  set chainId(String value) {
-    _$chainIdAtom.reportWrite(value, super.chainId, () {
-      super.chainId = value;
-    });
-  }
-
-  final _$appContractAddressAtom =
-      Atom(name: '_ContractStore.appContractAddress');
-
-  @override
-  String get appContractAddress {
-    _$appContractAddressAtom.reportRead();
-    return super.appContractAddress;
-  }
-
-  @override
-  set appContractAddress(String value) {
-    _$appContractAddressAtom.reportWrite(value, super.appContractAddress, () {
-      super.appContractAddress = value;
-    });
-  }
-
-  final _$connectedAccountAtom = Atom(name: '_ContractStore.connectedAccount');
-
-  @override
-  String get connectedAccount {
-    _$connectedAccountAtom.reportRead();
-    return super.connectedAccount;
-  }
-
-  @override
-  set connectedAccount(String value) {
-    _$connectedAccountAtom.reportWrite(value, super.connectedAccount, () {
-      super.connectedAccount = value;
-    });
-  }
-
-  final _$connectedAccountBalanceEthAtom =
-      Atom(name: '_ContractStore.connectedAccountBalanceEth');
-
-  @override
-  double get connectedAccountBalanceEth {
-    _$connectedAccountBalanceEthAtom.reportRead();
-    return super.connectedAccountBalanceEth;
-  }
-
-  @override
-  set connectedAccountBalanceEth(double value) {
-    _$connectedAccountBalanceEthAtom
-        .reportWrite(value, super.connectedAccountBalanceEth, () {
-      super.connectedAccountBalanceEth = value;
-    });
-  }
-
-  final _$selectedAddressAtom = Atom(name: '_ContractStore.selectedAddress');
-
-  @override
-  String get selectedAddress {
-    _$selectedAddressAtom.reportRead();
-    return super.selectedAddress;
-  }
-
-  @override
-  set selectedAddress(String value) {
-    _$selectedAddressAtom.reportWrite(value, super.selectedAddress, () {
-      super.selectedAddress = value;
-    });
-  }
-
-  final _$selectedAccountWithdrawableBalanceEthAtom =
-      Atom(name: '_ContractStore.selectedAccountWithdrawableBalanceEth');
-
-  @override
-  double get selectedAccountWithdrawableBalanceEth {
-    _$selectedAccountWithdrawableBalanceEthAtom.reportRead();
-    return super.selectedAccountWithdrawableBalanceEth;
-  }
-
-  @override
-  set selectedAccountWithdrawableBalanceEth(double value) {
-    _$selectedAccountWithdrawableBalanceEthAtom
-        .reportWrite(value, super.selectedAccountWithdrawableBalanceEth, () {
-      super.selectedAccountWithdrawableBalanceEth = value;
-    });
-  }
-
-  final _$metamaskAccountsAtom = Atom(name: '_ContractStore.metamaskAccounts');
-
-  @override
-  List<dynamic> get metamaskAccounts {
-    _$metamaskAccountsAtom.reportRead();
-    return super.metamaskAccounts;
-  }
-
-  @override
-  set metamaskAccounts(List<dynamic> value) {
-    _$metamaskAccountsAtom.reportWrite(value, super.metamaskAccounts, () {
-      super.metamaskAccounts = value;
     });
   }
 
@@ -326,6 +169,15 @@ mixin _$ContractStore on _ContractStore, Store {
     });
   }
 
+  final _$isContractOperationalAsyncAction =
+      AsyncAction('_ContractStore.isContractOperational');
+
+  @override
+  Future<bool> isContractOperational() {
+    return _$isContractOperationalAsyncAction
+        .run(() => super.isContractOperational());
+  }
+
   final _$registerAirlineAsyncAction =
       AsyncAction('_ContractStore.registerAirline');
 
@@ -396,17 +248,6 @@ mixin _$ContractStore on _ContractStore, Store {
       ActionController(name: '_ContractStore');
 
   @override
-  void selectPage(int index) {
-    final _$actionInfo = _$_ContractStoreActionController.startAction(
-        name: '_ContractStore.selectPage');
-    try {
-      return super.selectPage(index);
-    } finally {
-      _$_ContractStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void setPendingStatus(bool status) {
     final _$actionInfo = _$_ContractStoreActionController.startAction(
         name: '_ContractStore.setPendingStatus');
@@ -418,19 +259,43 @@ mixin _$ContractStore on _ContractStore, Store {
   }
 
   @override
+  Future<void> toggleOperationalStatus() {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.toggleOperationalStatus');
+    try {
+      return super.toggleOperationalStatus();
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  Future<void> setOperatingStatus() {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.setOperatingStatus');
+    try {
+      return super.setOperatingStatus();
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  Future<void> selectAccount() {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.selectAccount');
+    try {
+      return super.selectAccount();
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-carouselController: ${carouselController},
-selectedPageIndex: ${selectedPageIndex},
 isTransactionPending: ${isTransactionPending},
 sessionTransactionHistory: ${sessionTransactionHistory},
-chainId: ${chainId},
-appContractAddress: ${appContractAddress},
-connectedAccount: ${connectedAccount},
-connectedAccountBalanceEth: ${connectedAccountBalanceEth},
-selectedAddress: ${selectedAddress},
-selectedAccountWithdrawableBalanceEth: ${selectedAccountWithdrawableBalanceEth},
-metamaskAccounts: ${metamaskAccounts},
 accountBalance: ${accountBalance},
 isAccountConnected: ${isAccountConnected},
 isAppContractOperational: ${isAppContractOperational},
@@ -438,9 +303,7 @@ addressActors: ${addressActors},
 airlines: ${airlines},
 registeredFlights: ${registeredFlights},
 selectedFlight: ${selectedFlight},
-selectedFlightStatus: ${selectedFlightStatus},
-statusDescription: ${statusDescription},
-connectedAccountActor: ${connectedAccountActor}
+selectedFlightStatus: ${selectedFlightStatus}
     ''';
   }
 }

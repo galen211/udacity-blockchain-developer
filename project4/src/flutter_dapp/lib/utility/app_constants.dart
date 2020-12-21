@@ -1,7 +1,9 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dapp/utility/theme.dart';
+import 'package:web3dart/web3dart.dart';
 
-enum Actor { ContractOwner, Airline, Passenger, Oracle }
 enum FlightStatus {
   Unknown,
   LateAirline,
@@ -9,6 +11,7 @@ enum FlightStatus {
   LateTechnical,
   LateOther
 }
+
 enum ContractStatus { Paused, Operational }
 
 class App {
@@ -24,38 +27,27 @@ class App {
 
   App._internal();
 
-  // advice from the student
-  //
-
-  // priorities -> 1) connect to metamask, 2) create static layout of screens, 3) connect to contracts
-
-  // actions:
-  // Get AppContract Address, Get AppContract Status, Set AppContract Status
-  // Get DataContract Status, Set DataContract Status
-
-  // Contract Administration
-  // Airlines: Register Airline, Fund Airline, Register New Flight
-  // Passenger: Get Flights, Buy Insurance
-  // Oracles: Check Flight Status, Withdraw
-  // Transaction History: Event Log
-
-  // divider between list items
-  // use snackbar to log events?
-  // use circular progress indicator during transactions / also linear progress indicator
-  // use data table for flights
-
   static App get settings => _singleton;
 
   String get appBarTitleText => 'Flight Surety';
 
-  String get ethRpcServer => 'http://127.0.0.1:8545';
+  String get ethRpcServer => 'http://localhost:8545';
+  String get wsUrl => 'ws://localhost:8545';
 
   ThemeData get theme => FlightSuretyTheme().theme;
   AssetImage get backgroundImage => AssetImage("assets/images/flight.jpg");
 
-  final EdgeInsets _formContainerEdgeInsets = EdgeInsets.all(16.0);
-  //final double _formDefaultItemSpacer = 8.0;
-  EdgeInsets get formContainerEdgeInsets => _formContainerEdgeInsets;
+  final String contractOwner = 'Contract Owner';
+  final String airline1 = 'Airline: Cathay Pacific';
+  final String airline2 = 'Airline: Delta Airines';
+  final String airline3 = 'Airline: Air France';
+  final String airline4 = 'Airline: British Airways';
+  final String airline5 = 'Airline: All Nippon Airlines';
+  final String passenger1 = 'Passenger: Jibril Neville';
+  final String passenger2 = 'Passenger: Xavier Whitehouse';
+  final String passenger3 = 'Passenger: Brianna Carlson';
+  final String passenger4 = 'Passenger: Lilah Felix';
+  final String passenger5 = 'Passenger: Aizah Sosa';
 
   Map<int, String> statusCode = {
     0: 'Unknown',
@@ -65,4 +57,21 @@ class App {
     40: 'Late Due to Technical Problems',
     50: 'Late Due to Other Causes'
   };
+
+  // assumes 5 airlines, 5 passengers
+  Queue<String> get passengerNames => Queue.from([
+        passenger1,
+        passenger2,
+        passenger3,
+        passenger4,
+        passenger5,
+      ]);
+
+  Queue<String> get airlineNames => Queue.from([
+        airline1,
+        airline2,
+        airline3,
+        airline4,
+        airline5,
+      ]);
 }
