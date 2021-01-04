@@ -1,3 +1,6 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "dart.analysisExcludedFolders": [
+        "./project4/src/flutter_dapp/lib/generated_plugin_registrant.dart"
+    ]
 }

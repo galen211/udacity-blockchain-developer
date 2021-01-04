@@ -1,3 +1,5 @@
+@TestOn('chrome')
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,7 +10,9 @@ import 'package:flutter_dapp/data/config.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
-import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/html.dart';
+
+//import 'package:web_socket_channel/io.dart';
 
 void main() async {
   Accounts accounts;
@@ -34,7 +38,8 @@ void main() async {
 
     web3Client = Web3Client(configFile.localhost.url, http.Client(),
         socketConnector: () {
-      return IOWebSocketChannel.connect(wsUrl).cast<String>();
+      return HtmlWebSocketChannel.connect(wsUrl).cast<String>();
+      //return IOWebSocketChannel.connect(wsUrl).cast<String>();
     });
   });
 
@@ -111,7 +116,10 @@ List<Actor> setupActors(Accounts accounts) {
   accounts.privateKeys.forEach((key, value) {
     EthereumAddress address = EthereumAddress.fromHex(key);
     EthPrivateKey privateKey = EthPrivateKey.fromHex(value);
-    Actor actor = Actor(address, privateKey, ActorType.Unassigned);
+    Actor actor = Actor(
+        address: address,
+        privateKey: privateKey,
+        actorType: ActorType.Unassigned);
     actors.add(actor);
   });
 

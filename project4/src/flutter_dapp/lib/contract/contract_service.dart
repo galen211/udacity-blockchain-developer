@@ -1,107 +1,188 @@
-import 'dart:convert';
+import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_dapp/data/accounts.dart';
-import 'package:flutter_dapp/data/config.dart';
+import 'package:flutter_dapp/contract/prerequisites.dart';
+import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
-import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/html.dart';
 
-import 'flight.dart';
+final App appConstants = App.settings;
 
 class ContractService {
-  Accounts accounts;
-  Web3Client web3Client;
-  String wsUrl = 'ws://localhost:8545';
-
-  ConfigFile configFile;
-  List<Actor> actors;
+  Web3Client client;
 
   DeployedContract appContract;
   EthereumAddress appContractAddress;
 
+  DeployedContract dataContract;
+  EthereumAddress dataContractAddress;
+
   Map<String, ContractFunction> contractFunctions;
+  Map<String, ContractEvent> contractEvents;
+
+  Map<String, Flight> flightCodeToFlight;
 
   ContractService() {
-    initializeContractService();
-    initializeContractFunctions();
-  }
+    Prerequisites prerequisites = Prerequisites();
+    appContract = prerequisites.appContract;
+    appContractAddress = prerequisites.appContractAddress;
 
-  void initializeContractService() async {
-    String data = await rootBundle.loadString('assets/contracts/config.json');
-    var configMap = json.decode(data);
-    configFile = ConfigFile.fromJson(configMap);
+    contractFunctions = prerequisites.contractFunctions;
+    contractEvents = prerequisites.contractEvents;
 
-    web3Client = Web3Client(configFile.localhost.url, http.Client(),
+    flightCodeToFlight = prerequisites.flightCodeToFlight;
+
+    client = Web3Client(appConstants.ethRpcServer, http.Client(),
         socketConnector: () {
-      return IOWebSocketChannel.connect(wsUrl).cast<String>();
+      return HtmlWebSocketChannel.connect(appConstants.wsUrl).cast<String>();
+      // need to use HtmlWebSocketChannel bc web https://pub.dev/packages/web_socket_channel
     });
-
-    appContractAddress =
-        EthereumAddress.fromHex(configFile.localhost.appAddress);
-
-    final appContractString = await rootBundle
-        .loadString('assets/contracts/build/FlightSuretyApp.abi');
-
-    appContract = DeployedContract(
-        ContractAbi.fromJson(appContractString, 'FlightSuretyApp'),
-        appContractAddress);
   }
 
-  void initializeContractFunctions() {
-    contractFunctions = Map<String, ContractFunction>();
-    final appIsOperational = appContract.function('isOperational');
+  Stream<List<dynamic>> registerStream(ContractEvent contractEvent) {
+    return client
+        .events(
+            FilterOptions.events(contract: appContract, event: contractEvent))
+        .take(1)
+        .map((event) => contractEvent.decodeResults(event.topics, event.data));
+  }
+
+  Future<EthereumAddress> getContractOwner({EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['contractOwner'],
+        params: []);
+    return response[0] as EthereumAddress;
+  }
+
+  Future<bool> isOperational({EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['isOperational'],
+        params: []);
+    return response[0] as bool;
+  }
+
+  Future<void> setOperatingStatus({bool mode, Credentials credentials}) async {
+    await client.sendTransaction(
+      credentials,
+      Transaction.callContract(
+          contract: appContract,
+          function: contractFunctions['setOperationalStatus'],
+          parameters: [mode]),
+    );
+  }
+
+  Future<bool> isAirlineRegistered(
+      {EthereumAddress airlineAddress, EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['isAirlineRegistered'],
+        params: [airlineAddress]);
+    return response[0] as bool;
+  }
+
+  Future<bool> isAirlineFunded(
+      {EthereumAddress airlineAddress, EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['isAirlineFunded'],
+        params: [airlineAddress]);
+    return response[0] as bool;
   }
 
   Future<void> registerAirline(
-      EthereumAddress airlineAddress, EthereumAddress sender) async {
-    ContractFunction appFunction = contractFunctions['registerAirline'];
-    try {
-      final response = await web3Client.call(
-          sender: sender,
-          contract: appContract,
-          function: appFunction,
-          params: [airlineAddress]);
-    } catch (e) {
-      debugPrint(e);
-    }
+      {EthereumAddress airlineAddress,
+      EthereumAddress sender,
+      Credentials credentials}) async {
+    final tx = await client.sendTransaction(
+      credentials,
+      Transaction.callContract(
+        contract: appContract,
+        function: contractFunctions['registerAirline'],
+        parameters: [airlineAddress],
+      ),
+    );
+    print(tx.toString());
+  }
 
-    return Future.delayed(Duration(milliseconds: 500));
+  Future<int> numberAirlineVotes(
+      {EthereumAddress airlineAddress, EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['numberAirlineVotes'],
+        params: [airlineAddress]);
+    return response[0] as int;
+  }
+
+  Future<void> nominateAirline(
+      {EthereumAddress airlineAddress,
+      String airlineName,
+      EthereumAddress sender,
+      Credentials credentials}) async {
+    await client.sendTransaction(
+        credentials,
+        Transaction.callContract(
+            contract: appContract,
+            function: contractFunctions['nominateAirline'],
+            parameters: [
+              airlineAddress,
+              airlineName,
+            ],
+            from: sender));
   }
 
   Future<void> fundAirline(
-      EthereumAddress airlineAddress, EthereumAddress sender) async {
-    ContractFunction appFunction = contractFunctions['fundAirline'];
-    try {
-      final response = await web3Client.call(
-          sender: sender,
+      {EthereumAddress sender,
+      Credentials credentials,
+      EtherAmount value}) async {
+    await client.sendTransaction(
+        credentials,
+        Transaction.callContract(
+            contract: appContract,
+            function: contractFunctions['fundAirline'],
+            parameters: [],
+            from: sender,
+            value: value));
+  }
+
+  Future<void> registerFlight(
+      {Flight flight, EthereumAddress sender, Credentials credentials}) async {
+    await client.sendTransaction(
+        credentials,
+        Transaction.callContract(
           contract: appContract,
-          function: appFunction,
-          params: [airlineAddress]);
-    } catch (e) {
-      debugPrint(e);
-    }
-    return Future.delayed(Duration(milliseconds: 500));
+          function: contractFunctions['registerFlight'],
+          parameters: [
+            flight.flightIata,
+            BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
+          ],
+          from: sender,
+        ));
   }
 
-  Future<void> registerFlight(Flight flight) async {
-    return Future.delayed(Duration(milliseconds: 500));
+  Future<bool> isFlightRegistered(
+      {Flight flight, EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['isFlightRegistered'],
+        params: [
+          flight.airlineAddress,
+          flight.flightIata,
+          BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
+        ]);
+    return response[0] as bool;
   }
 
-  Future<List<Flight>> getFlights() async {
-    List<Flight> flights = [];
-    for (var i = 0; i < 5; i++) {
-      Flight flight = Flight(
-          flightName: 'Flight $i',
-          departureTime: DateTime(2020, 1, 21),
-          flightAirline: "0x8923dd8sKD",
-          flightStatus: 30,
-          selected: false);
-      flights.add(flight);
-    }
-    return Future.delayed(Duration(milliseconds: 500)).then((_) => flights);
+  List<Flight> getUnregisteredFlights() {
+    return flightCodeToFlight.values.toList();
   }
 
   Future<void> purchaseInsurance(double amountEth) async {
@@ -113,8 +194,9 @@ class ContractService {
         .then((value) => FlightStatus.LateAirline);
   }
 
-  Future<double> queryAvailableBalance(String account) async {
-    return Future.delayed(Duration(milliseconds: 500)).then((value) => 1000.0);
+  Future<EtherAmount> queryAvailableBalance(EthereumAddress address) async {
+    EtherAmount balance = await client.getBalance(address);
+    return balance;
   }
 
   Future<void> withdrawAvailableBalance() async {

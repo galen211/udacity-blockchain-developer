@@ -11,7 +11,7 @@ class TransactionStatus extends StatefulWidget {
 class _TransactionStatusState extends State<TransactionStatus> {
   @override
   Widget build(BuildContext context) {
-    final ContractStore store = Provider.of<ContractStore>(context);
+    final store = Provider.of<ContractStore>(context);
     return Observer(
       builder: (_) =>
           store.isTransactionPending ? LinearProgressIndicator() : Container(),

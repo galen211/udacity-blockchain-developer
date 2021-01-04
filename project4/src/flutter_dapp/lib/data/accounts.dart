@@ -1,4 +1,13 @@
+// To parse this JSON data, do
+//
+//     final accounts = accountsFromJson(jsonString);
+
+import 'dart:collection';
 import 'dart:convert';
+
+Accounts accountsFromJson(String str) => Accounts.fromJson(json.decode(str));
+
+String accountsToJson(Accounts data) => json.encode(data.toJson());
 
 class Accounts {
   Accounts({
@@ -6,18 +15,13 @@ class Accounts {
     this.privateKeys,
   });
 
-  final Map<String, Address> addresses;
-  final Map<String, String> privateKeys;
-
-  factory Accounts.fromRawJson(String str) =>
-      Accounts.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
+  LinkedHashMap<String, Address> addresses;
+  LinkedHashMap<String, String> privateKeys;
 
   factory Accounts.fromJson(Map<String, dynamic> json) => Accounts(
-        addresses: Map.from(json["addresses"])
+        addresses: LinkedHashMap.from(json["addresses"])
             .map((k, v) => MapEntry<String, Address>(k, Address.fromJson(v))),
-        privateKeys: Map.from(json["private_keys"])
+        privateKeys: LinkedHashMap.from(json["private_keys"])
             .map((k, v) => MapEntry<String, String>(k, v)),
       );
 
@@ -37,14 +41,10 @@ class Address {
     this.account,
   });
 
-  final Key secretKey;
-  final Key publicKey;
-  final String address;
-  final Account account;
-
-  factory Address.fromRawJson(String str) => Address.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
+  Key secretKey;
+  Key publicKey;
+  String address;
+  Account account;
 
   factory Address.fromJson(Map<String, dynamic> json) => Address(
         secretKey: Key.fromJson(json["secretKey"]),
@@ -69,14 +69,10 @@ class Account {
     this.codeHash,
   });
 
-  final Nonce nonce;
-  final Balance balance;
-  final String stateRoot;
-  final String codeHash;
-
-  factory Account.fromRawJson(String str) => Account.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
+  Nonce nonce;
+  Balance balance;
+  String stateRoot;
+  String codeHash;
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
         nonce: nonceValues.map[json["nonce"]],
@@ -93,10 +89,10 @@ class Account {
       };
 }
 
-enum Balance { THE_0_X056_BC75_E2_D63100000 }
+enum Balance { THE_0_X3635_C9_ADC5_DEA00000 }
 
 final balanceValues =
-    EnumValues({"0x056bc75e2d63100000": Balance.THE_0_X056_BC75_E2_D63100000});
+    EnumValues({"0x3635c9adc5dea00000": Balance.THE_0_X3635_C9_ADC5_DEA00000});
 
 enum Nonce { THE_0_X }
 
@@ -108,12 +104,8 @@ class Key {
     this.data,
   });
 
-  final Type type;
-  final List<int> data;
-
-  factory Key.fromRawJson(String str) => Key.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
+  Type type;
+  List<int> data;
 
   factory Key.fromJson(Map<String, dynamic> json) => Key(
         type: typeValues.map[json["type"]],
