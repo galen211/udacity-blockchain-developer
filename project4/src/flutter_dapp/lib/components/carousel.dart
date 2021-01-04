@@ -9,7 +9,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 class ViewCarousel extends StatelessWidget {
-  List<Widget> pages = [
+  final List<Widget> pages = [
     SetupPage(),
     AirlinePage(),
     PassengerPage(),

@@ -18,7 +18,6 @@ class FlightSuretyTheme {
     return base.copyWith(
       accentColor: kAccentColor,
       primaryColor: kPrimaryColor,
-      buttonColor: kButtonColor,
       snackBarTheme: SnackBarThemeData(
         backgroundColor: kAccentColor,
         behavior: SnackBarBehavior.floating,
@@ -26,15 +25,35 @@ class FlightSuretyTheme {
       scaffoldBackgroundColor: kScaffoldBackgroundColor,
       cardColor: kCardColor,
       errorColor: kErrorColor,
-      buttonTheme: base.buttonTheme.copyWith(
-        buttonColor: kPrimaryColor,
-        colorScheme: base.colorScheme.copyWith(
-          secondary: kSecondaryButtonColor,
-        ),
-      ),
-      buttonBarTheme: base.buttonBarTheme.copyWith(
-        buttonTextTheme: ButtonTextTheme.accent,
-      ),
+      // buttonTheme: base.buttonTheme.copyWith(
+      //   colorScheme: ColorScheme.highContrastDark().copyWith(
+      //     primary: kAccentColor,
+      //   ),
+      // ),
+      //   buttonColor: kAccentColor,
+      //   disabledColor: kAccentColor,
+      //   focusColor: kAccentColor,
+      //   hoverColor: kAccentColor,
+      //   highlightColor: kAccentColor,
+      //   splashColor: kAccentColor,
+      //   colorScheme: base.colorScheme.copyWith(
+      //     primary: kAccentColor,
+      //     primaryVariant: kAccentColor,
+      //     secondary: kAccentColor,
+      //     secondaryVariant: kAccentColor,
+      //     surface: kAccentColor,
+      //     background: kAccentColor,
+      //     error: kAccentColor,
+      //     onPrimary: kAccentColor,
+      //     onSecondary: kAccentColor,
+      //     onSurface: kAccentColor,
+      //     onBackground: kAccentColor,
+      //     onError: kAccentColor,
+      //   ),
+      // ),
+      // buttonBarTheme: base.buttonBarTheme.copyWith(
+      //   buttonTextTheme: ButtonTextTheme.accent,
+      // ),
       primaryIconTheme: base.iconTheme.copyWith(color: kPrimaryIconThemeColor),
       inputDecorationTheme: InputDecorationTheme(
         border: CornersBorder(),

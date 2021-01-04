@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_dapp/components/flight_selected.dart';
 import 'package:flutter_dapp/contract/contract_store.dart';
-import 'package:flutter_dapp/contract/flight.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+
+import 'flight_table.dart';
 
 class PassengerPage extends StatefulWidget {
   @override
@@ -12,8 +13,6 @@ class PassengerPage extends StatefulWidget {
 }
 
 class _PassengerPageState extends State<PassengerPage> {
-  int _selectedItem;
-
   @override
   Widget build(BuildContext context) {
     final store = Provider.of<ContractStore>(context);
@@ -22,15 +21,17 @@ class _PassengerPageState extends State<PassengerPage> {
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.max,
           children: [
             Center(
               child: Text(
-                "Flights",
-                style: TextStyle(fontSize: 18),
+                'Purchase Flight Insurance',
+                style: Theme.of(context).textTheme.headline5,
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(5),
+            SizedBox(
+              height: 20,
             ),
             Expanded(
               child: Observer(
@@ -40,43 +41,16 @@ class _PassengerPageState extends State<PassengerPage> {
                           child: Text("No flights are currently registered"),
                         ),
                       )
-                    : Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.white70),
-                        ),
-                        child: Scrollbar(
-                          child: ListView.builder(
-                            padding: EdgeInsets.all(5),
-                            shrinkWrap: true,
-                            itemCount: store.registeredFlights.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              Flight flight = store.registeredFlights[index];
-                              return ListTile(
-                                hoverColor: Colors.white70,
-                                isThreeLine: true,
-                                selected: _selectedItem == index,
-                                onTap: () {
-                                  setState(() {
-                                    _selectedItem = index;
-                                  });
-                                },
-                                contentPadding: EdgeInsets.all(5),
-                                leading: Icon(Icons.flight),
-                                title: Text(flight.flightName),
-                                subtitle: Text(
-                                    'Departure time: ${flight.departureTime}'),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
+                    : FlightTable(),
               ),
             ),
             Padding(
               padding: EdgeInsets.all(5),
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
               children: [
                 ButtonBar(
                   overflowDirection: VerticalDirection.down,
@@ -84,8 +58,8 @@ class _PassengerPageState extends State<PassengerPage> {
                   children: [
                     FlatButton(
                       color: Colors.blueAccent,
-                      onPressed: () async {
-                        await store.getFlights();
+                      onPressed: () {
+                        store.getFlights();
                       },
                       child: Text('Get Flights'),
                     ),
@@ -96,11 +70,12 @@ class _PassengerPageState extends State<PassengerPage> {
                     ),
                   ],
                 ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 300,
-                  ),
-                  child: Center(
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 300,
+                    ),
                     child: TextFormField(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: const InputDecoration(
@@ -122,8 +97,18 @@ class _PassengerPageState extends State<PassengerPage> {
                         }
                         if (amount > 1)
                           return "Cannot purchase more than 1 ETH insurance";
+                        return "";
                       },
                     ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 300,
+                    ),
+                    child: FlightSelected(),
                   ),
                 ),
               ],

@@ -83,6 +83,9 @@ it("Cannot re-register an airline that has already been registered", async () =>
 });
 ```
 
+### Gas Estimation
+I used the `eth-gas-reporter` npm package to estimate gas costs.  Given the high gas costs a user would incur by calling these contracts, there is definitely room to improve the implementation.  The ![gas reporter file](fs-gas-report.rst) contains the measurements of gas consumption for the `flightSurety.js` tests.
+
 ## Running the dApp
 The frontend of the dApp can be run locally by simply executing `npm run server` and `npm run dapp:prod`.  **Note:** in order for the dapp to run properly, the contracts must have been deployed by running `npx truffle deploy --reset`.  This will deploy the contracts onto a local Ethereum node.
 

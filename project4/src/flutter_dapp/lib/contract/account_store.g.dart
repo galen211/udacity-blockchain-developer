@@ -9,13 +9,28 @@ part of 'account_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$AccountStore on _AccountStore, Store {
-  Computed<String> _$statusDescriptionComputed;
+  Computed<bool> _$isAccountConnectedComputed;
 
   @override
-  String get statusDescription => (_$statusDescriptionComputed ??=
-          Computed<String>(() => super.statusDescription,
-              name: '_AccountStore.statusDescription'))
+  bool get isAccountConnected => (_$isAccountConnectedComputed ??=
+          Computed<bool>(() => super.isAccountConnected,
+              name: '_AccountStore.isAccountConnected'))
       .value;
+  Computed<String> _$printedEtherAmountComputed;
+
+  @override
+  String get printedEtherAmount => (_$printedEtherAmountComputed ??=
+          Computed<String>(() => super.printedEtherAmount,
+              name: '_AccountStore.printedEtherAmount'))
+      .value;
+  Computed<String> _$selectedAccountDescriptionComputed;
+
+  @override
+  String get selectedAccountDescription =>
+      (_$selectedAccountDescriptionComputed ??= Computed<String>(
+              () => super.selectedAccountDescription,
+              name: '_AccountStore.selectedAccountDescription'))
+          .value;
 
   final _$selectedPageIndexAtom = Atom(name: '_AccountStore.selectedPageIndex');
 
@@ -63,20 +78,37 @@ mixin _$AccountStore on _AccountStore, Store {
     });
   }
 
-  final _$isAccountConnectedAtom =
-      Atom(name: '_AccountStore.isAccountConnected');
+  final _$selectedAccountBalanceAtom =
+      Atom(name: '_AccountStore.selectedAccountBalance');
 
   @override
-  bool get isAccountConnected {
-    _$isAccountConnectedAtom.reportRead();
-    return super.isAccountConnected;
+  EtherAmount get selectedAccountBalance {
+    _$selectedAccountBalanceAtom.reportRead();
+    return super.selectedAccountBalance;
   }
 
   @override
-  set isAccountConnected(bool value) {
-    _$isAccountConnectedAtom.reportWrite(value, super.isAccountConnected, () {
-      super.isAccountConnected = value;
+  set selectedAccountBalance(EtherAmount value) {
+    _$selectedAccountBalanceAtom
+        .reportWrite(value, super.selectedAccountBalance, () {
+      super.selectedAccountBalance = value;
     });
+  }
+
+  final _$updateBalanceAsyncAction = AsyncAction('_AccountStore.updateBalance');
+
+  @override
+  Future<void> updateBalance(Actor actor) {
+    return _$updateBalanceAsyncAction.run(() => super.updateBalance(actor));
+  }
+
+  final _$showAccountSelectionAsyncAction =
+      AsyncAction('_AccountStore.showAccountSelection');
+
+  @override
+  Future<void> showAccountSelection(BuildContext context) {
+    return _$showAccountSelectionAsyncAction
+        .run(() => super.showAccountSelection(context));
   }
 
   final _$_AccountStoreActionController =
@@ -88,17 +120,6 @@ mixin _$AccountStore on _AccountStore, Store {
         name: '_AccountStore.selectPage');
     try {
       return super.selectPage(index);
-    } finally {
-      _$_AccountStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void selectAccount(Actor actor) {
-    final _$actionInfo = _$_AccountStoreActionController.startAction(
-        name: '_AccountStore.selectAccount');
-    try {
-      return super.selectAccount(actor);
     } finally {
       _$_AccountStoreActionController.endAction(_$actionInfo);
     }
@@ -132,8 +153,10 @@ mixin _$AccountStore on _AccountStore, Store {
 selectedPageIndex: ${selectedPageIndex},
 carouselController: ${carouselController},
 selectedActor: ${selectedActor},
+selectedAccountBalance: ${selectedAccountBalance},
 isAccountConnected: ${isAccountConnected},
-statusDescription: ${statusDescription}
+printedEtherAmount: ${printedEtherAmount},
+selectedAccountDescription: ${selectedAccountDescription}
     ''';
   }
 }

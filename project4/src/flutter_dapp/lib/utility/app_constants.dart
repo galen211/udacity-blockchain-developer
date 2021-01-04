@@ -1,8 +1,6 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/utility/theme.dart';
-import 'package:web3dart/web3dart.dart';
 
 enum FlightStatus {
   Unknown,
@@ -37,18 +35,6 @@ class App {
   ThemeData get theme => FlightSuretyTheme().theme;
   AssetImage get backgroundImage => AssetImage("assets/images/flight.jpg");
 
-  final String contractOwner = 'Contract Owner';
-  final String airline1 = 'Airline: Cathay Pacific';
-  final String airline2 = 'Airline: Delta Airines';
-  final String airline3 = 'Airline: Air France';
-  final String airline4 = 'Airline: British Airways';
-  final String airline5 = 'Airline: All Nippon Airlines';
-  final String passenger1 = 'Passenger: Jibril Neville';
-  final String passenger2 = 'Passenger: Xavier Whitehouse';
-  final String passenger3 = 'Passenger: Brianna Carlson';
-  final String passenger4 = 'Passenger: Lilah Felix';
-  final String passenger5 = 'Passenger: Aizah Sosa';
-
   Map<int, String> statusCode = {
     0: 'Unknown',
     10: 'On Time',
@@ -59,19 +45,58 @@ class App {
   };
 
   // assumes 5 airlines, 5 passengers
-  Queue<String> get passengerNames => Queue.from([
-        passenger1,
-        passenger2,
-        passenger3,
-        passenger4,
-        passenger5,
+  List<String> get passengerNames => List.from([
+        AppActor.passenger1,
+        AppActor.passenger2,
+        AppActor.passenger3,
+        AppActor.passenger4,
+        AppActor.passenger5,
       ]);
 
-  Queue<String> get airlineNames => Queue.from([
-        airline1,
-        airline2,
-        airline3,
-        airline4,
-        airline5,
+  List<String> get airlineNames => List.from([
+        AppActor.airline1,
+        AppActor.airline2,
+        AppActor.airline3,
+        AppActor.airline4,
+        AppActor.airline5,
       ]);
+}
+
+class AppActor {
+  static String get contractOwner => 'Contract Owner';
+  static String get airline1 => 'Cathay Pacific';
+  static String get airline2 => 'Delta Airines';
+  static String get airline3 => 'Air France';
+  static String get airline4 => 'British Airways';
+  static String get airline5 => 'All Nippon Airways';
+  static String get passenger1 => 'Galen Simmons';
+  static String get passenger2 => 'John Whitehouse';
+  static String get passenger3 => 'Helene Seydoux';
+  static String get passenger4 => 'Lilah Gerard';
+  static String get passenger5 => 'Julie Waldmann';
+}
+
+// contract event names
+class AppEvent {
+  static String get airlineNominated => 'AirlineNominated';
+  static String get airlineRegistered => 'AirlineRegistered';
+  static String get airlineFunded => 'AirlineFunded';
+  static String get flightRegistered => 'FlightRegistered';
+  static String get insurancePurchased => 'InsurancePurchased';
+  static String get insurancePayout => 'InsurancePayout';
+  static String get flightStatusInfo => 'FlightStatusInfo';
+  static String get oracleReport => 'OracleReport';
+  static String get oracleRequest => 'OracleRequest';
+}
+
+class AppFlights {
+  static final AppFlights _instance = AppFlights._internal();
+
+  List<Flight> flights;
+
+  factory AppFlights() {
+    return _instance;
+  }
+
+  AppFlights._internal();
 }

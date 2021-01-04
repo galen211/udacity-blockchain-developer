@@ -15,13 +15,14 @@ module.exports = async (deployer, network, accounts) => {
     await data.authorizeCaller(FlightSuretyApp.address, {from: contractOwner});
     
     // nominate and register the first airline from the data contract
-    await data.nominateAirline(firstAirline);
+    await data.nominateAirline(firstAirline); // Note hard-coded
     await data.registerAirline(firstAirline);
     
-    let app = await FlightSuretyApp.deployed()
+    let app = await FlightSuretyApp.deployed();
 
     console.log(`Data address: ${data.address}`);
     console.log(`App address: ${app.address}`);
+    console.log(`First airline address: ${firstAirline}`);
     
     let config = {
         localhost: {
