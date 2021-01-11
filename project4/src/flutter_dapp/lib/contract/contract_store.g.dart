@@ -9,6 +9,13 @@ part of 'contract_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ContractStore on _ContractStore, Store {
+  Computed<ActorType> _$actorTypeComputed;
+
+  @override
+  ActorType get actorType =>
+      (_$actorTypeComputed ??= Computed<ActorType>(() => super.actorType,
+              name: '_ContractStore.actorType'))
+          .value;
   Computed<Actor> _$selectedActorComputed;
 
   @override
@@ -16,23 +23,20 @@ mixin _$ContractStore on _ContractStore, Store {
       (_$selectedActorComputed ??= Computed<Actor>(() => super.selectedActor,
               name: '_ContractStore.selectedActor'))
           .value;
-
-  final _$sessionTransactionHistoryAtom =
-      Atom(name: '_ContractStore.sessionTransactionHistory');
+  Computed<String> _$airlineVotesStringComputed;
 
   @override
-  ObservableList<String> get sessionTransactionHistory {
-    _$sessionTransactionHistoryAtom.reportRead();
-    return super.sessionTransactionHistory;
-  }
+  String get airlineVotesString => (_$airlineVotesStringComputed ??=
+          Computed<String>(() => super.airlineVotesString,
+              name: '_ContractStore.airlineVotesString'))
+      .value;
+  Computed<String> _$airlineFundingStringComputed;
 
   @override
-  set sessionTransactionHistory(ObservableList<String> value) {
-    _$sessionTransactionHistoryAtom
-        .reportWrite(value, super.sessionTransactionHistory, () {
-      super.sessionTransactionHistory = value;
-    });
-  }
+  String get airlineFundingString => (_$airlineFundingStringComputed ??=
+          Computed<String>(() => super.airlineFundingString,
+              name: '_ContractStore.airlineFundingString'))
+      .value;
 
   final _$eventStreamAtom = Atom(name: '_ContractStore.eventStream');
 
@@ -46,6 +50,21 @@ mixin _$ContractStore on _ContractStore, Store {
   set eventStream(ObservableStream<dynamic> value) {
     _$eventStreamAtom.reportWrite(value, super.eventStream, () {
       super.eventStream = value;
+    });
+  }
+
+  final _$eventsAtom = Atom(name: '_ContractStore.events');
+
+  @override
+  ObservableList<FlightSuretyEvent> get events {
+    _$eventsAtom.reportRead();
+    return super.events;
+  }
+
+  @override
+  set events(ObservableList<FlightSuretyEvent> value) {
+    _$eventsAtom.reportWrite(value, super.events, () {
+      super.events = value;
     });
   }
 
@@ -112,6 +131,21 @@ mixin _$ContractStore on _ContractStore, Store {
     });
   }
 
+  final _$selectedAirlineAtom = Atom(name: '_ContractStore.selectedAirline');
+
+  @override
+  Actor get selectedAirline {
+    _$selectedAirlineAtom.reportRead();
+    return super.selectedAirline;
+  }
+
+  @override
+  set selectedAirline(Actor value) {
+    _$selectedAirlineAtom.reportWrite(value, super.selectedAirline, () {
+      super.selectedAirline = value;
+    });
+  }
+
   final _$registeredFlightsAtom =
       Atom(name: '_ContractStore.registeredFlights');
 
@@ -158,20 +192,20 @@ mixin _$ContractStore on _ContractStore, Store {
     });
   }
 
-  final _$airlineFundingAmountAtom =
-      Atom(name: '_ContractStore.airlineFundingAmount');
+  final _$addAirlineFundingAmountAtom =
+      Atom(name: '_ContractStore.addAirlineFundingAmount');
 
   @override
-  EtherAmount get airlineFundingAmount {
-    _$airlineFundingAmountAtom.reportRead();
-    return super.airlineFundingAmount;
+  EtherAmount get addAirlineFundingAmount {
+    _$addAirlineFundingAmountAtom.reportRead();
+    return super.addAirlineFundingAmount;
   }
 
   @override
-  set airlineFundingAmount(EtherAmount value) {
-    _$airlineFundingAmountAtom.reportWrite(value, super.airlineFundingAmount,
-        () {
-      super.airlineFundingAmount = value;
+  set addAirlineFundingAmount(EtherAmount value) {
+    _$addAirlineFundingAmountAtom
+        .reportWrite(value, super.addAirlineFundingAmount, () {
+      super.addAirlineFundingAmount = value;
     });
   }
 
@@ -202,6 +236,52 @@ mixin _$ContractStore on _ContractStore, Store {
   set selectedTime(TimeOfDay value) {
     _$selectedTimeAtom.reportWrite(value, super.selectedTime, () {
       super.selectedTime = value;
+    });
+  }
+
+  final _$withdrawablePayoutAtom =
+      Atom(name: '_ContractStore.withdrawablePayout');
+
+  @override
+  EtherAmount get withdrawablePayout {
+    _$withdrawablePayoutAtom.reportRead();
+    return super.withdrawablePayout;
+  }
+
+  @override
+  set withdrawablePayout(EtherAmount value) {
+    _$withdrawablePayoutAtom.reportWrite(value, super.withdrawablePayout, () {
+      super.withdrawablePayout = value;
+    });
+  }
+
+  final _$airlineVotesAtom = Atom(name: '_ContractStore.airlineVotes');
+
+  @override
+  int get airlineVotes {
+    _$airlineVotesAtom.reportRead();
+    return super.airlineVotes;
+  }
+
+  @override
+  set airlineVotes(int value) {
+    _$airlineVotesAtom.reportWrite(value, super.airlineVotes, () {
+      super.airlineVotes = value;
+    });
+  }
+
+  final _$airlineFundingAtom = Atom(name: '_ContractStore.airlineFunding');
+
+  @override
+  EtherAmount get airlineFunding {
+    _$airlineFundingAtom.reportRead();
+    return super.airlineFunding;
+  }
+
+  @override
+  set airlineFunding(EtherAmount value) {
+    _$airlineFundingAtom.reportWrite(value, super.airlineFunding, () {
+      super.airlineFunding = value;
     });
   }
 
@@ -293,6 +373,28 @@ mixin _$ContractStore on _ContractStore, Store {
       ActionController(name: '_ContractStore');
 
   @override
+  List<DropdownMenuItem<Airport>> airportsDropdown() {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.airportsDropdown');
+    try {
+      return super.airportsDropdown();
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  List<DropdownMenuItem<Actor>> airlinesDropdown() {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.airlinesDropdown');
+    try {
+      return super.airlinesDropdown();
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void getFlights() {
     final _$actionInfo = _$_ContractStoreActionController.startAction(
         name: '_ContractStore.getFlights');
@@ -304,21 +406,39 @@ mixin _$ContractStore on _ContractStore, Store {
   }
 
   @override
+  Widget eventToWidget(BuildContext context, int index) {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.eventToWidget');
+    try {
+      return super.eventToWidget(context, index);
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-sessionTransactionHistory: ${sessionTransactionHistory},
 eventStream: ${eventStream},
+events: ${events},
 isAppOperational: ${isAppOperational},
 isTransactionPending: ${isTransactionPending},
 isAirlinesSetup: ${isAirlinesSetup},
 isFlightsRegistered: ${isFlightsRegistered},
+selectedAirline: ${selectedAirline},
 registeredFlights: ${registeredFlights},
 selectedFlight: ${selectedFlight},
 proposedFlight: ${proposedFlight},
-airlineFundingAmount: ${airlineFundingAmount},
+addAirlineFundingAmount: ${addAirlineFundingAmount},
 selectedDate: ${selectedDate},
 selectedTime: ${selectedTime},
-selectedActor: ${selectedActor}
+withdrawablePayout: ${withdrawablePayout},
+airlineVotes: ${airlineVotes},
+airlineFunding: ${airlineFunding},
+actorType: ${actorType},
+selectedActor: ${selectedActor},
+airlineVotesString: ${airlineVotesString},
+airlineFundingString: ${airlineFundingString}
     ''';
   }
 }

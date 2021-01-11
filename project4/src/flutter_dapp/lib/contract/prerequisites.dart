@@ -25,6 +25,7 @@ class Prerequisites {
 
   Map<String, Flight> flightCodeToFlight = Map<String, Flight>();
   Map<String, Actor> airlineCodeToActor = Map<String, Actor>();
+  List<Airport> airports;
 
   DeployedContract appContract;
   EthereumAddress appContractAddress;
@@ -33,7 +34,7 @@ class Prerequisites {
   EthereumAddress dataContractAddress;
 
   Map<String, ContractFunction> contractFunctions;
-  Map<String, ContractEvent> contractEvents;
+  Map<EventType, ContractEvent> contractEvents;
   Map<String, FlightSuretyEvent Function(List<dynamic> decodedData)>
       contractData;
 
@@ -55,6 +56,7 @@ class Prerequisites {
     setupContractFunctions();
     setupContractEvents();
     await setupFlights();
+    setupAirports();
   }
 
   Future<void> loadAccounts() async {
@@ -98,7 +100,7 @@ class Prerequisites {
       'assets/data/airline_nh.json',
     ];
 
-    files.forEach((file) async {
+    await Future.wait(files.map((file) async {
       var raw = await rootBundle.loadString(file);
       ff.FlightFile flightFile = ff.FlightFile.fromRawJson(raw);
       flightFile.data.forEach((f) {
@@ -123,7 +125,7 @@ class Prerequisites {
 
         flightCodeToFlight[f.flight.iata] = flight;
       });
-    });
+    }));
   }
 
   void setupActors() {
@@ -134,9 +136,16 @@ class Prerequisites {
       EthereumAddress address = EthereumAddress.fromHex(key);
       EthPrivateKey privateKey = EthPrivateKey.fromHex(value);
       Actor actor = Actor(
-          address: address,
-          privateKey: privateKey,
-          actorType: ActorType.Unassigned);
+        address: address,
+        privateKey: privateKey,
+        actorType: ActorType.Unassigned,
+        isAirlineFunded: false,
+        isAirlineRegistered: false,
+        airlineFunding: EtherAmount.zero(),
+        airlineVotes: 0,
+        accountBalance: EtherAmount.zero(),
+        withdrawablePayout: EtherAmount.zero(),
+      );
       actorList.add(actor);
     });
 
@@ -196,23 +205,34 @@ class Prerequisites {
     contractFunctions = Map<String, ContractFunction>();
 
     List<String> functionNames = [
-      'contractOwner',
-      'isOperational',
-      'setOperationalStatus',
-      'isAirlineRegistered',
-      'isAirlineFunded',
+      // external
+      'fundAirline',
+      'buyFlightInsurance',
+      'registerOracle',
+      'officialFlightStatus',
       'nominateAirline',
       'registerAirline',
-      'fundAirline',
-      'isFlightRegistered',
-      'registerFlight',
-      'officialFlightStatus',
-      'buyFlightInsurance',
-      'fetchFlightStatus',
-      'isOracleRegistered',
-      'registerOracle',
-      'getMyIndexes',
       'numberAirlineVotes',
+      'isOperational',
+      'amountAirlineFunds',
+      'registerFlight',
+      'setOperationalStatus',
+      'isAirlineRegistered',
+      'isPassengerInsured',
+      'isPaidOut',
+      'passengerBalance',
+      'withdrawBalance',
+      'isAirlineFunded',
+      'getMyIndexes',
+      'fetchFlightStatus',
+      'submitOracleResponse',
+      'MAX_INSURANCE_AMOUNT',
+      'MIN_AIRLINE_FUNDING',
+      'contractOwner',
+      'dataContractAddress',
+      'REGISTRATION_FEE',
+      'isFlightRegistered',
+      'isOracleRegistered',
     ];
 
     functionNames.forEach((key) {
@@ -221,42 +241,22 @@ class Prerequisites {
   }
 
   void setupContractEvents() {
-    contractEvents = Map<String, ContractEvent>();
+    contractEvents = Map<EventType, ContractEvent>();
 
-    List<String> eventNames = [
-      'AirlineNominated',
-      'AirlineRegistered',
-      'AirlineFunded',
-      'FlightRegistered',
-      'InsurancePurchased',
-      'InsurancePayout',
-      'FlightStatusInfo',
-      'OracleReport',
-      'OracleRequest',
-    ];
+    for (EventType eventType in EventType.values) {
+      contractEvents[eventType] = appContract.event(eventType.eventName());
+    }
+  }
 
-    eventNames.forEach((key) {
-      contractEvents[key] = appContract.event(key);
+  void setupAirports() {
+    assert(flightCodeToFlight.isNotEmpty);
+
+    Set<Airport> airportSet = Set<Airport>();
+    flightCodeToFlight.values.forEach((flight) {
+      airportSet.add(flight.departureAirport);
+      airportSet.add(flight.arrivalAirport);
     });
-
-    contractData = {
-      'AirlineNominated': (List<dynamic> decodedData) =>
-          AirlineNominated(decodedData),
-      'AirlineRegistered': (List<dynamic> decodedData) =>
-          AirlineRegistered(decodedData),
-      'AirlineFunded': (List<dynamic> decodedData) =>
-          AirlineFunded(decodedData),
-      'FlightRegistered': (List<dynamic> decodedData) =>
-          FlightRegistered(decodedData),
-      'InsurancePurchased': (List<dynamic> decodedData) =>
-          InsurancePurchased(decodedData),
-      'InsurancePayout': (List<dynamic> decodedData) =>
-          InsurancePayout(decodedData),
-      'FlightStatusInfo': (List<dynamic> decodedData) =>
-          FlightStatusInfo(decodedData),
-      'OracleReport': (List<dynamic> decodedData) => OracleReport(decodedData),
-      'OracleRequest': (List<dynamic> decodedData) =>
-          OracleRequest(decodedData),
-    };
+    airports = airportSet.toList();
+    airports.sort((a, b) => a.airportIata.compareTo(b.airportIata));
   }
 }

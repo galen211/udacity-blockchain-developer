@@ -1,4 +1,6 @@
-pragma solidity >=0.4.26;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.7.6;
 
 import "./SafeMath.sol";
 
@@ -14,7 +16,7 @@ contract FlightSuretyData {
 
     mapping(address => bool) private authorizedCaller;
 
-    constructor() public {
+    constructor() {
         contractOwner = msg.sender;
         authorizedCaller[contractOwner] = true; // add contractOwner as an authorized caller
     }
@@ -80,10 +82,10 @@ contract FlightSuretyData {
     /********************************************************************************************/
     
     // Mappings
-    mapping(address => Airline) public airlines;
-    mapping(bytes32 => Flight) public flights;
-    mapping(bytes32 => FlightInsurance) public flightInsurance;
-    mapping(address => uint256) public passengerBalance;
+    mapping(address => Airline) private airlines;
+    mapping(bytes32 => Flight) private flights;
+    mapping(bytes32 => FlightInsurance) private flightInsurance;
+    mapping(address => uint256) private passengerBalance;
 
     // Structs
     struct Airline {
@@ -94,13 +96,9 @@ contract FlightSuretyData {
     }
     
     struct FlightInsurance {
-        mapping(address => PassengerContract) contracts;
+        mapping(address => uint256) purchasedAmount;
         address[] passengers;
         bool isPaidOut;
-    }
-    
-    struct PassengerContract {
-        uint256 purchasedAmount;
     }
     
     struct Flight {
@@ -218,7 +216,7 @@ contract FlightSuretyData {
 
     function registerFlight(
         address airline,
-        string flight,
+        string memory flight,
         uint256 departureTime,
         uint8 statusCode
     ) external requireIsOperational requireCallerAuthorized returns(bool) {
@@ -264,9 +262,7 @@ contract FlightSuretyData {
         requireCallerAuthorized
     {
         airlines[airlineAddress].underwrittenAmount.add(insuranceAmount);
-        flightInsurance[flightKey].contracts[passengerAddress] = PassengerContract({
-            purchasedAmount: insuranceAmount
-        });
+        flightInsurance[flightKey].purchasedAmount[passengerAddress] = insuranceAmount;
         flightInsurance[flightKey].passengers.push(passengerAddress);
     }
     
@@ -276,7 +272,7 @@ contract FlightSuretyData {
         requireCallerAuthorized
         returns(bool)
     {
-        return flightInsurance[flightKey].contracts[passengerAddress].purchasedAmount > 0;
+        return flightInsurance[flightKey].purchasedAmount[passengerAddress] > 0;
     }
     
     function isPaidOut(bytes32 flightKey) external view
@@ -295,21 +291,22 @@ contract FlightSuretyData {
         return passengerBalance[passengerAddress];
     }
 
-    function creditInsurees(bytes32 flightKey) external 
+    function creditInsurees(bytes32 flightKey, address airlineAddress) external 
         requireIsOperational
         requireCallerAuthorized
     {
-        for(uint i = 0; i <= flightInsurance[flightKey].passengers.length; i++) {
+        require(!flightInsurance[flightKey].isPaidOut,"Flight insurance already paid out");
+        for(uint i = 0; i < flightInsurance[flightKey].passengers.length; i++) {
             address passengerAddress = flightInsurance[flightKey].passengers[i];
-            PassengerContract memory passengerContract = flightInsurance[flightKey].contracts[passengerAddress];
-            uint256 payoutAmount = passengerContract.purchasedAmount.mul(2).div(3);
+            uint256 purchasedAmount = flightInsurance[flightKey].purchasedAmount[passengerAddress];
+            uint256 payoutAmount = purchasedAmount.mul(3).div(2);
             passengerBalance[passengerAddress] = passengerBalance[passengerAddress].add(payoutAmount);
-            flightInsurance[flightKey].contracts[passengerAddress] = passengerContract;
+            airlines[airlineAddress].funds.sub(payoutAmount);
         }
         flightInsurance[flightKey].isPaidOut = true;
     }
 
-    function payPassenger(address insured, uint256 amount) external         
+    function payPassenger(address payable insured, uint256 amount) external         
         requireIsOperational
         requireCallerAuthorized
         requireSufficientBalance(insured, amount) // this is business logic, but makes sense to hard code in the data contract
@@ -321,13 +318,17 @@ contract FlightSuretyData {
 
     function getFlightKey(
         address airline,
-        string flight,
+        string memory flight,
         uint256 departureTime
     ) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(airline, flight, departureTime));
     }
 
-    function() external payable requireCallerAuthorized {
+    fallback()  external payable requireCallerAuthorized {
         // funds the contract
+    }
+    
+    receive() external payable {
+        // custom function code
     }
 }

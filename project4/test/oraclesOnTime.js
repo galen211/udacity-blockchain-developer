@@ -8,6 +8,7 @@ const {
   expectRevert, // Assertions for transactions that should fail
   balance,
   ether,
+  send,
 } = require("@openzeppelin/test-helpers");
 
 contract("Oracle Functionality", async (accounts) => {
@@ -58,20 +59,13 @@ contract("Oracle Functionality", async (accounts) => {
       passengerAddress = actors.passenger1;
       reportedFlightStatus = STATUS_CODE_ON_TIME;
 
-      // printing for debug
+      // printing for debug with remix
       console.log("-----------------------");
       console.log("Passenger address: " + passengerAddress);
       console.log("Flight Airline: " + flightAirline);
       console.log("Flight Name:    " + flightName);
       console.log("Departure Time: " + departureTime);
 
-      let counter = 1;
-      oracles.forEach((oracleAccount) => {
-        console.log("Oracle Account " + counter++ + ": " + oracleAccount);
-      });
-      console.log("-----------------------");
-
-      console.log("LOG: Setup complete");
     });
 
     it("Register oracles", async () => {
@@ -88,7 +82,6 @@ contract("Oracle Functionality", async (accounts) => {
 
         expect(await app.isOracleRegistered.call(oracleAccount)).to.be.true;
       });
-      console.log("LOG: Register oracles complete");
     });
 
     it("Fund airline", async () => {
@@ -100,12 +93,10 @@ contract("Oracle Functionality", async (accounts) => {
       });
       expectEvent(tx0, "AirlineFunded", {
         airlineAddress: flightAirline,
-        airlineName: actorNames.get(flightAirline),
         amount: airlineFundingAmount,
       });
 
       expect(await app.isAirlineFunded.call(flightAirline)).to.be.true;
-      console.log("LOG: Fund airline complete");
     });
 
     it("Register flight", async () => {
@@ -114,7 +105,6 @@ contract("Oracle Functionality", async (accounts) => {
       });
       expectEvent(tx1, "FlightRegistered", {
         airlineAddress: flightAirline,
-        airlineName: actorNames.get(flightAirline),
         flight: flightName,
       });
 
@@ -125,7 +115,6 @@ contract("Oracle Functionality", async (accounts) => {
           departureTime
         )
       ).to.be.true;
-      console.log("LOG: Register flight complete");
     });
 
     it("Purchase insurance", async () => {
@@ -148,7 +137,6 @@ contract("Oracle Functionality", async (accounts) => {
           departureTime
         )
       ).to.be.true;
-      console.log("LOG: Purchase insurance complete");
     });
 
     it("Check initial flight status", async () => {
@@ -159,8 +147,6 @@ contract("Oracle Functionality", async (accounts) => {
         { from: passengerAddress }
       );
       expect(status.toNumber()).to.be.equal(STATUS_CODE_UNKNOWN);
-
-      console.log("LOG: Check initial flight status complete");
     });
 
     it("Fetch flight status", async () => {
@@ -183,62 +169,74 @@ contract("Oracle Functionality", async (accounts) => {
           departureTime: departureTime,
         }
       );
-      console.log("LOG: Fetch flight status complete");
     });
 
     it("Report flight status", async () => {
       let acceptedReports = 0;
-      oracles.forEach(async (oracleAccount) => {
-        expect(await app.isOracleRegistered.call(oracleAccount)).to.be.true;
 
-        let oracleIndexes = await app.getMyIndexes.call({
-          from: oracleAccount,
-        });
+      // console.log("Flight Airline: " + flightAirline);
+      // console.log("Flight Name: " + flightName);
+      // console.log("Departure Time: " + departureTime);
+      // console.log("Reported Flight Status: " + reportedFlightStatus);
 
-        expect(oracleIndexes).to.have.lengthOf(3);
+      let verifiedResponses = 0;
 
-        for (let idx = 0; idx < 3; idx++) {
-          let reportTx;
-          try {
-            reportTx = await app.submitOracleResponse(
-              oracleIndexes[idx],
-              flightAirline,
-              flightName,
-              departureTime,
-              reportedFlightStatus,
-              { from: oracleAccount }
-            );
+      let promises = Promise.all(
+        oracles.map(async (oracleAccount) => {
+          expect(await app.isOracleRegistered.call(oracleAccount)).to.be.true;
 
-            // expectEvent(reportTx, "OracleReport", {
-            //   airline: flightAirline,
-            //   flight: flightName,
-            //   departureTime: departureTime,
-            //   status: reportedFlightStatus,
-            // });
+          let oracleIndexes = await app.getMyIndexes.call({
+            from: oracleAccount,
+          });
 
-            acceptedReports++;
-            // console.log(
-            //   "Success",
-            //   idx,
-            //   oracleIndexes[idx].toNumber(),
-            //   flightName
-            // );
-          } catch (e) {
-            // console.log(
-            //   "Error",
-            //   idx,
-            //   oracleIndexes[idx].toNumber(),
-            //   flightName
-            // );
-            //expect(tx.message).to.include("Index does not match oracle request");
+          expect(oracleIndexes).to.have.lengthOf(3);
+
+          for (let idx = 0; idx < 3; idx++) {
+            try {
+              await app.submitOracleResponse(
+                oracleIndexes[idx],
+                flightAirline,
+                flightName,
+                departureTime,
+                reportedFlightStatus,
+                { from: oracleAccount }
+              );
+
+              verifiedResponses++;
+              // expectEvent.inTransaction(promise, app, "OracleReport", {
+              //   airline: flightAirline,
+              //   flight: flightName,
+              //   departureTime: departureTime,
+              //   status: reportedFlightStatus,
+              // });
+
+              // console.log(
+              //   "Oracle:",
+              //   oracleAccount,
+              //   "Success",
+              //   idx,
+              //   oracleIndexes[idx].toNumber(),
+              //   flightName
+              // );
+            } catch (e) {
+              // console.log(
+              //   "Oracle:",
+              //   oracleAccount,
+              //   "Error",
+              //   idx,
+              //   oracleIndexes[idx].toNumber(),
+              //   flightName
+              // );
+            }
           }
-        }
-      });
-      //   expect(acceptedReports).to.be.gte(MIN_ORACLE_RESPONSES);
-      console.log("LOG: Report flight status complete");
+        })
+      );
+
+      await promises;
+      expect(verifiedResponses).to.be.gte(MIN_ORACLE_RESPONSES);
     });
 
-    it("Verify flight status is on time", async () => {
+    it("Verify flight status is late due to airline", async () => {
       let status = await app.officialFlightStatus.call(
         flightAirline,
         flightName,
@@ -246,7 +244,6 @@ contract("Oracle Functionality", async (accounts) => {
         { from: passengerAddress }
       );
       expect(status.toNumber()).to.be.equal(reportedFlightStatus);
-      console.log("LOG: Verify flight status complete");
     });
 
     it("Verify insurance payout", async () => {
@@ -256,11 +253,10 @@ contract("Oracle Functionality", async (accounts) => {
         departureTime,
         { from: passengerAddress }
       );
-      assert.equal(isPaidOut, false, "Insurance not paid out");
+      assert.equal(isPaidOut, false, "Insurance should not be paid out");
 
       let passengerBalance = await app.passengerBalance(passengerAddress);
       expect(passengerBalance).to.be.bignumber.equal(ether("0"));
-      console.log("LOG: Verify insurance payout complete");
     });
   }); // describe
 }); // contract

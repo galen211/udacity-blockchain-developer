@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:web3dart/web3dart.dart';
 
-enum ActorType { ContractOwner, Airline, Passenger, Oracle, Unassigned }
+enum ActorType {
+  ContractOwner,
+  Airline,
+  Passenger,
+  Oracle,
+  Unassigned,
+  NotConnected
+}
 
 extension ParseToString on ActorType {
   String actorTypeName() {
@@ -20,6 +27,9 @@ extension ParseToString on ActorType {
         break;
       case ActorType.Unassigned:
         return 'Unassigned';
+        break;
+      case ActorType.NotConnected:
+        return 'Not Connected';
         break;
       default:
         return 'Invalid';
@@ -61,5 +71,23 @@ class Actor {
     accountBalance ??= EtherAmount.fromUnitAndValue(EtherUnit.ether, 0);
     withdrawablePayout ??= EtherAmount.fromUnitAndValue(EtherUnit.ether, 0);
     airlineFunding ??= EtherAmount.fromUnitAndValue(EtherUnit.ether, 0);
+  }
+
+  static Actor nullActor() {
+    Actor actor = Actor(
+      actorType: ActorType.NotConnected,
+      address:
+          EthereumAddress.fromHex('0x0000000000000000000000000000000000000000'),
+      privateKey:
+          EthPrivateKey.fromHex('0x0000000000000000000000000000000000000000'),
+      actorName: 'Not Connected',
+      accountBalance: EtherAmount.zero(),
+      withdrawablePayout: EtherAmount.zero(),
+      airlineFunding: EtherAmount.zero(),
+      isAirlineRegistered: false,
+      isAirlineFunded: false,
+      airlineVotes: 0,
+    );
+    return actor;
   }
 }

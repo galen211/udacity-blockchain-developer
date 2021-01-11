@@ -9,11 +9,13 @@ class PermissionedButton extends StatelessWidget {
   final Function action;
   final String buttonText;
   final bool disableCondition;
+  final unassignedRoleAllowed;
 
   PermissionedButton(
       {@required this.requiredRole,
       @required this.action,
       @required this.buttonText,
+      this.unassignedRoleAllowed = false,
       this.disableCondition = false})
       : assert(requiredRole != null),
         assert(action != null),
@@ -30,7 +32,9 @@ class PermissionedButton extends StatelessWidget {
           color: Colors.blueAccent,
           onPressed: (store.selectedActor == null ||
                   store.selectedActor.actorType != requiredRole ||
-                  disableCondition)
+                  disableCondition ||
+                  !(unassignedRoleAllowed &&
+                      store.selectedActor.actorType == ActorType.Unassigned))
               ? null
               : action,
           child: Text(buttonText),

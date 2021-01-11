@@ -1,5 +1,4 @@
 var Test = require('../config/testConfig.js');
-const testConfig = require('../config/testConfig.js');
 const { expect } = require('chai');
 
 const {

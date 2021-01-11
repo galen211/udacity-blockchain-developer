@@ -5,6 +5,7 @@ import 'package:async/async.dart';
 import 'package:flutter_dapp/contract/contract_service.dart';
 import 'package:flutter_dapp/contract/prerequisites.dart';
 import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/events.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web3dart/web3dart.dart';
@@ -14,7 +15,7 @@ final App app = App.settings;
 Prerequisites prerequisites;
 
 Map<String, Actor> actors;
-Map<String, ContractEvent> contractEvents;
+Map<EventType, ContractEvent> contractEvents;
 
 ContractService service;
 StreamGroup streamGroup;

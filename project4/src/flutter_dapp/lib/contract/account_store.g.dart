@@ -31,6 +31,28 @@ mixin _$AccountStore on _AccountStore, Store {
               () => super.selectedAccountDescription,
               name: '_AccountStore.selectedAccountDescription'))
           .value;
+  Computed<String> _$actorNameComputed;
+
+  @override
+  String get actorName =>
+      (_$actorNameComputed ??= Computed<String>(() => super.actorName,
+              name: '_AccountStore.actorName'))
+          .value;
+
+  final _$selectedActorAtom = Atom(name: '_AccountStore.selectedActor');
+
+  @override
+  Actor get selectedActor {
+    _$selectedActorAtom.reportRead();
+    return super.selectedActor;
+  }
+
+  @override
+  set selectedActor(Actor value) {
+    _$selectedActorAtom.reportWrite(value, super.selectedActor, () {
+      super.selectedActor = value;
+    });
+  }
 
   final _$selectedPageIndexAtom = Atom(name: '_AccountStore.selectedPageIndex');
 
@@ -47,6 +69,21 @@ mixin _$AccountStore on _AccountStore, Store {
     });
   }
 
+  final _$accountChangedAtom = Atom(name: '_AccountStore.accountChanged');
+
+  @override
+  bool get accountChanged {
+    _$accountChangedAtom.reportRead();
+    return super.accountChanged;
+  }
+
+  @override
+  set accountChanged(bool value) {
+    _$accountChangedAtom.reportWrite(value, super.accountChanged, () {
+      super.accountChanged = value;
+    });
+  }
+
   final _$carouselControllerAtom =
       Atom(name: '_AccountStore.carouselController');
 
@@ -60,21 +97,6 @@ mixin _$AccountStore on _AccountStore, Store {
   set carouselController(CarouselController value) {
     _$carouselControllerAtom.reportWrite(value, super.carouselController, () {
       super.carouselController = value;
-    });
-  }
-
-  final _$selectedActorAtom = Atom(name: '_AccountStore.selectedActor');
-
-  @override
-  Actor get selectedActor {
-    _$selectedActorAtom.reportRead();
-    return super.selectedActor;
-  }
-
-  @override
-  set selectedActor(Actor value) {
-    _$selectedActorAtom.reportWrite(value, super.selectedActor, () {
-      super.selectedActor = value;
     });
   }
 
@@ -95,20 +117,47 @@ mixin _$AccountStore on _AccountStore, Store {
     });
   }
 
+  final _$updateAirlineFundingAsyncAction =
+      AsyncAction('_AccountStore.updateAirlineFunding');
+
+  @override
+  Future<void> updateAirlineFunding() {
+    return _$updateAirlineFundingAsyncAction
+        .run(() => super.updateAirlineFunding());
+  }
+
+  final _$updateAirlineVotesAsyncAction =
+      AsyncAction('_AccountStore.updateAirlineVotes');
+
+  @override
+  Future<void> updateAirlineVotes() {
+    return _$updateAirlineVotesAsyncAction
+        .run(() => super.updateAirlineVotes());
+  }
+
+  final _$updateAirlineStatusAsyncAction =
+      AsyncAction('_AccountStore.updateAirlineStatus');
+
+  @override
+  Future<void> updateAirlineStatus() {
+    return _$updateAirlineStatusAsyncAction
+        .run(() => super.updateAirlineStatus());
+  }
+
+  final _$updatePassengerBalanceAsyncAction =
+      AsyncAction('_AccountStore.updatePassengerBalance');
+
+  @override
+  Future<void> updatePassengerBalance() {
+    return _$updatePassengerBalanceAsyncAction
+        .run(() => super.updatePassengerBalance());
+  }
+
   final _$updateBalanceAsyncAction = AsyncAction('_AccountStore.updateBalance');
 
   @override
   Future<void> updateBalance(Actor actor) {
     return _$updateBalanceAsyncAction.run(() => super.updateBalance(actor));
-  }
-
-  final _$showAccountSelectionAsyncAction =
-      AsyncAction('_AccountStore.showAccountSelection');
-
-  @override
-  Future<void> showAccountSelection(BuildContext context) {
-    return _$showAccountSelectionAsyncAction
-        .run(() => super.showAccountSelection(context));
   }
 
   final _$_AccountStoreActionController =
@@ -120,17 +169,6 @@ mixin _$AccountStore on _AccountStore, Store {
         name: '_AccountStore.selectPage');
     try {
       return super.selectPage(index);
-    } finally {
-      _$_AccountStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  String actorName() {
-    final _$actionInfo = _$_AccountStoreActionController.startAction(
-        name: '_AccountStore.actorName');
-    try {
-      return super.actorName();
     } finally {
       _$_AccountStoreActionController.endAction(_$actionInfo);
     }
@@ -150,13 +188,15 @@ mixin _$AccountStore on _AccountStore, Store {
   @override
   String toString() {
     return '''
-selectedPageIndex: ${selectedPageIndex},
-carouselController: ${carouselController},
 selectedActor: ${selectedActor},
+selectedPageIndex: ${selectedPageIndex},
+accountChanged: ${accountChanged},
+carouselController: ${carouselController},
 selectedAccountBalance: ${selectedAccountBalance},
 isAccountConnected: ${isAccountConnected},
 printedEtherAmount: ${printedEtherAmount},
-selectedAccountDescription: ${selectedAccountDescription}
+selectedAccountDescription: ${selectedAccountDescription},
+actorName: ${actorName}
     ''';
   }
 }

@@ -31,8 +31,9 @@ class ViewCarousel extends StatelessWidget {
                   options: CarouselOptions(
                     height: 600,
                     autoPlay: false,
-                    autoPlayAnimationDuration: Duration(milliseconds: 500),
-                    autoPlayCurve: Curves.linear,
+                    pageSnapping: true,
+                    autoPlayAnimationDuration: Duration(milliseconds: 200),
+                    autoPlayCurve: Curves.easeInExpo,
                     enlargeCenterPage: true,
                     viewportFraction: 0.9,
                   ),

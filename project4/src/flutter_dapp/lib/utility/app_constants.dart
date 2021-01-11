@@ -7,7 +7,8 @@ enum FlightStatus {
   LateAirline,
   LateWeather,
   LateTechnical,
-  LateOther
+  LateOther,
+  OnTime,
 }
 
 enum ContractStatus { Paused, Operational }

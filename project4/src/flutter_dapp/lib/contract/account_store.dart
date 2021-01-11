@@ -27,7 +27,13 @@ abstract class _AccountStore with Store {
   }
 
   @observable
+  Actor selectedActor = Actor.nullActor();
+
+  @observable
   int selectedPageIndex = 0;
+
+  @observable
+  bool accountChanged = false;
 
   @observable
   CarouselController carouselController = CarouselController();
@@ -42,14 +48,10 @@ abstract class _AccountStore with Store {
   }
 
   @observable
-  Actor selectedActor;
-
-  @observable
-  EtherAmount selectedAccountBalance =
-      EtherAmount.fromUnitAndValue(EtherUnit.ether, 0);
+  EtherAmount selectedAccountBalance = EtherAmount.zero();
 
   @computed
-  bool get isAccountConnected => selectedActor != null;
+  bool get isAccountConnected => selectedActor.actorName != 'Not Connected';
 
   @computed
   String get printedEtherAmount =>
@@ -65,27 +67,78 @@ abstract class _AccountStore with Store {
   void setupValidations() {
     _disposers = [
       autorun((_) => updateBalance(selectedActor)),
+      autorun((_) {
+        if (selectedActor.actorType == ActorType.Airline) {
+          updateAirlineFunding();
+          updateAirlineVotes();
+        }
+      }),
+      autorun((_) {
+        if (selectedActor.actorType == ActorType.Passenger) {
+          updatePassengerBalance();
+        }
+      }),
     ];
   }
 
-  @computed
-  String get selectedAccountDescription => selectedActor == null
-      ? 'Not Connected'
-      : '${selectedActor.actorType.actorTypeName()}: ${selectedActor.address.hex.substring(0, 6)}...${selectedActor.address.hex.substring(35, 41)} | Balance: $printedEtherAmount ETH';
+  @action
+  Future<void> updateAirlineFunding() async {
+    EtherAmount fundingBalance = await service.amountAirlineFunds(
+      airlineAddress: selectedActor.address,
+      sender: selectedActor.address,
+    );
+    selectedActor.airlineFunding = fundingBalance;
+  }
+
+  @action
+  Future<void> updateAirlineVotes() async {
+    int votes = await service.numberAirlineVotes(
+      airlineAddress: selectedActor.address,
+      sender: selectedActor.address,
+    );
+    selectedActor.airlineVotes = votes;
+  }
+
+  @action
+  Future<void> updateAirlineStatus() async {
+    bool registered = await service.isAirlineRegistered(
+      airlineAddress: selectedActor.address,
+      sender: selectedActor.address,
+    );
+    selectedActor.isAirlineRegistered = registered;
+
+    bool funded = await service.isAirlineFunded(
+      airlineAddress: selectedActor.address,
+      sender: selectedActor.address,
+    );
+    selectedActor.isAirlineRegistered = funded;
+  }
+
+  @action
+  Future<void> updatePassengerBalance() async {
+    EtherAmount payoutAmount = await service.passengerBalance(
+      passenger: selectedActor.address,
+      sender: selectedActor.address,
+    );
+    selectedActor.withdrawablePayout = payoutAmount;
+  }
 
   @action
   Future<void> updateBalance(Actor actor) async {
-    if (actor == null) return;
-    EtherAmount balance = await service.queryAvailableBalance(actor.address);
+    EtherAmount balance =
+        await service.getAccountBalance(account: actor.address);
     selectedActor.accountBalance = balance;
     selectedAccountBalance = balance;
   }
 
-  @action
-  String actorName() {
-    return actors.keys
-        .firstWhere((key) => actors[key].address == selectedActor.address);
-  }
+  @computed
+  String get selectedAccountDescription => selectedActor.actorName ==
+          'Not Connected'
+      ? 'Not Connected'
+      : '${selectedActor.actorType.actorTypeName()}: ${selectedActor.address.hex.substring(0, 6)}...${selectedActor.address.hex.substring(35, 41)} | Balance: $printedEtherAmount ETH';
+
+  @computed
+  String get actorName => selectedActor.actorName;
 
   @action
   List<DropdownMenuItem<Actor>> accountsDropdown() {
@@ -97,48 +150,5 @@ abstract class _AccountStore with Store {
       ));
     });
     return dropdown;
-  }
-
-  @action
-  Future<void> showAccountSelection(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Select Account'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                DropdownButtonFormField<Actor>(
-                  hint: Text("Choose an account to use"),
-                  isDense: true,
-                  isExpanded: true,
-                  value: selectedActor,
-                  items: accountsDropdown(),
-                  onChanged: (value) {
-                    selectedActor = value;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                final snackBar = SnackBar(
-                  content: Text(
-                      'You are now transacting as "${selectedActor.actorName}" at address: ${selectedActor.address.hex}'),
-                  duration: Duration(seconds: 3),
-                );
-                ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

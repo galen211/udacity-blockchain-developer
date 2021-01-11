@@ -31,15 +31,16 @@ abstract class _ContractStore with Store {
   EthereumAddress dataContractAddress;
 
   Map<String, ContractFunction> contractFunctions;
-  Map<String, ContractEvent> contractEvents;
-  Map<String, FlightSuretyEvent Function(List<dynamic> decodedData)>
-      contractData;
+  Map<EventType, ContractEvent> contractEvents;
 
   Map<String, Flight> flights;
   Map<String, Actor> airlines;
+  List<Airport> airports;
 
   StreamGroup<FlightSuretyEvent> streamGroup;
   StreamSubscription<FlightSuretyEvent> subscription;
+
+  List<ReactionDisposer> _disposers;
 
   _ContractStore(AccountStore accountStore) {
     prerequisites = Prerequisites();
@@ -53,20 +54,58 @@ abstract class _ContractStore with Store {
 
     contractFunctions = prerequisites.contractFunctions;
     contractEvents = prerequisites.contractEvents;
-    contractData = prerequisites.contractData;
+    airports = prerequisites.airports;
 
     service = ContractService();
     account = accountStore;
 
-    //setupStreams();
+    setupValidations();
+    setupStreams();
+  }
+
+  void dispose() {
+    _disposers.forEach((disposer) {
+      disposer();
+    });
+  }
+
+  void setupValidations() {
+    _disposers = [
+      autorun((_) async {
+        if (account.accountChanged) {
+          await account.updateAirlineFunding();
+          airlineFunding = account.selectedActor.airlineFunding;
+          await account.updateAirlineVotes();
+          airlineVotes = account.selectedActor.airlineVotes;
+          account.updateBalance(selectedActor);
+        }
+      }),
+      autorun((_) async {
+        if (!isTransactionPending || actorType == ActorType.Airline) {
+          await account.updateAirlineFunding();
+          airlineFunding = account.selectedActor.airlineFunding;
+          await account.updateAirlineVotes();
+          airlineVotes = account.selectedActor.airlineVotes;
+          account.updateBalance(selectedActor);
+          await account.updateAirlineStatus();
+        }
+      }),
+      autorun((_) async {
+        if (!isTransactionPending || actorType == ActorType.Passenger) {
+          await account.updatePassengerBalance();
+          withdrawablePayout = account.selectedActor.withdrawablePayout;
+          account.updateBalance(selectedActor);
+        }
+      }),
+    ];
   }
 
   @observable
-  ObservableList<String> sessionTransactionHistory =
-      ObservableList<String>(); // could try substring highlight for log text
+  ObservableStream eventStream;
 
   @observable
-  ObservableStream eventStream;
+  ObservableList<FlightSuretyEvent> events =
+      ObservableList<FlightSuretyEvent>();
 
   @observable
   bool isAppOperational = true;
@@ -81,6 +120,12 @@ abstract class _ContractStore with Store {
   bool isFlightsRegistered = false;
 
   @observable
+  Actor selectedAirline = Actor.nullActor();
+
+  @computed
+  ActorType get actorType => selectedActor.actorType;
+
+  @observable
   ObservableList<Flight> registeredFlights = ObservableList();
 
   @observable
@@ -89,8 +134,40 @@ abstract class _ContractStore with Store {
   @observable
   Flight proposedFlight = Flight();
 
+  @action
+  List<DropdownMenuItem<Airport>> airportsDropdown() {
+    List<DropdownMenuItem<Airport>> dropdown = <DropdownMenuItem<Airport>>[];
+    airports.forEach((airport) {
+      dropdown.add(
+        DropdownMenuItem<Airport>(
+          child: Text(airport.airportDescription()),
+          value: airport,
+        ),
+      );
+    });
+    return dropdown;
+  }
+
+  @action
+  List<DropdownMenuItem<Actor>> airlinesDropdown() {
+    List<DropdownMenuItem<Actor>> dropdown = <DropdownMenuItem<Actor>>[];
+    account.actors.entries
+        .where((e) => (e.value.actorType == ActorType.Airline ||
+            e.value.actorType == ActorType.Unassigned))
+        .forEach((e) {
+      dropdown.add(
+        DropdownMenuItem<Actor>(
+          child: Text(e.value.actorName),
+          value: e.value,
+        ),
+      );
+    });
+    return dropdown;
+  }
+
   @observable
-  EtherAmount airlineFundingAmount = EtherAmount.zero();
+  EtherAmount addAirlineFundingAmount =
+      EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
 
   @observable
   DateTime selectedDate = DateTime.now();
@@ -99,7 +176,24 @@ abstract class _ContractStore with Store {
   TimeOfDay selectedTime = TimeOfDay.now();
 
   @computed
-  Actor get selectedActor => account?.selectedActor;
+  Actor get selectedActor => account.selectedActor;
+
+  @observable
+  EtherAmount withdrawablePayout = EtherAmount.zero();
+
+  @observable
+  int airlineVotes = 0;
+
+  @observable
+  EtherAmount airlineFunding = EtherAmount.zero();
+
+  @computed
+  String get airlineVotesString => airlineVotes.toString();
+
+  @computed
+  String get airlineFundingString =>
+      (airlineFunding.getValueInUnit(EtherUnit.finney) / 1000)
+          .toStringAsFixed(4);
 
   @action
   Future<bool> isContractOperational() async {
@@ -131,17 +225,25 @@ abstract class _ContractStore with Store {
     try {
       await service.registerFlight(
           flight: proposedFlight, credentials: selectedActor.privateKey);
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('Register airline failed with ${e.message}');
+    }
   }
 
   @action
   Future<void> fundAirline() async {
     try {
+      debugPrint(
+          "Funding airline with amount: ${addAirlineFundingAmount.getInWei.toString()}");
       await service.fundAirline(
           sender: selectedActor.address,
           credentials: selectedActor.privateKey,
-          value: airlineFundingAmount);
-    } catch (e) {}
+          value: addAirlineFundingAmount);
+      await account.updateAirlineFunding();
+      debugPrint("Funding succeeded");
+    } catch (e) {
+      debugPrint('Fund airline failed with ${e.message}');
+    }
   }
 
   @action
@@ -156,7 +258,9 @@ abstract class _ContractStore with Store {
   Future<void> purchaseInsurance() async {
     try {
       //await service.purchaseInsurance();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('Purchase insurance failed with ${e.message}');
+    }
   }
 
   @action
@@ -185,11 +289,69 @@ abstract class _ContractStore with Store {
   Future<void> withdrawAvailableBalance() async {
     // final proceed = await warnNot(Actor.Passenger);
     // if (!proceed) return transactionCancelled();
-    try {
-      await service.withdrawAvailableBalance();
-    } catch (e) {}
   }
 
+  @action
+  Widget eventToWidget(BuildContext context, int index) {
+    return Card(
+      elevation: 8,
+      color: Colors.blueAccent,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SelectableText(
+              events[index].eventType.eventName(),
+              style: Theme.of(context).textTheme.bodyText2,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            SelectableText(
+              events[index].description(),
+              style: Theme.of(context).textTheme.caption,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void setupStreams() {
+    streamGroup = StreamGroup.broadcast();
+
+    contractEvents.forEach((eventType, contractEvent) {
+      Stream<FlightSuretyEvent> stream = service
+          .registerStream(contractEvent)
+          .map((List<dynamic> decodedData) {
+        FlightSuretyEvent event = FlightSuretyEvent(eventType, decodedData);
+        return event;
+      });
+      streamGroup.add(stream);
+    });
+
+    eventStream = streamGroup.stream.asObservable();
+
+    subscription = streamGroup.stream.listen(
+      (FlightSuretyEvent event) {
+        events.add(event);
+        debugPrint("Event: ${event.description()}");
+      },
+      onError: (e) {
+        debugPrint("Stream Error ${e.toString()}");
+      },
+      onDone: () {
+        debugPrint("Stream Done");
+        subscription.cancel();
+      },
+      cancelOnError: false,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Setup Functions
   @action
   Future<void> registerAllFlights() async {
     flights.values.forEach((flight) async {
@@ -229,7 +391,7 @@ abstract class _ContractStore with Store {
       bool result = await service.isAirlineFunded(
           airlineAddress: firstAirline.address, sender: firstAirline.address);
       debugPrint(
-          'Registered ${firstAirline.actorName} Address: ${firstAirline.address.hex} \n Result: $result');
+          'Funded ${firstAirline.actorName} Address: ${firstAirline.address.hex} \n Result: $result');
     } catch (e) {
       debugPrint(
           'failed to fund ${firstAirline.actorName} Address: ${firstAirline.address.hex} \n Error: ${e.message}');
@@ -237,17 +399,13 @@ abstract class _ContractStore with Store {
 
     List<Actor> airlineList = airlines.values.toList();
 
-    await Future.delayed(Duration(seconds: 2));
     debugPrint('---- Registering Airlines ----');
 
-    for (var i = 1; i < airlineList.length; i++) {
+    for (var i = 1; i < airlineList.length - 1; i++) {
       Actor airlineToRegister = airlineList[i];
-      debugPrint(
-          'Registering: ${airlineToRegister.actorName}, ${airlineToRegister.address.hex}');
       try {
         await service.nominateAirline(
             airlineAddress: airlineToRegister.address,
-            airlineName: airlineToRegister.actorName,
             sender: firstAirline.address,
             credentials: firstAirline.privateKey);
 
@@ -268,76 +426,79 @@ abstract class _ContractStore with Store {
       }
     }
 
-    // await Future.delayed(Duration(seconds: 4));
-    // debugPrint('---- Funding Airlines ----');
+    debugPrint('---- Funding Airlines ----');
 
-    // for (var i = 1; i < airlineList.length - 1; i++) {
-    //   try {
-    //     await service.fundAirline(
-    //         sender: airlineList[i].address,
-    //         credentials: airlineList[i].privateKey,
-    //         value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10));
-    //     bool isFunded = await service.isAirlineFunded(
-    //         airlineAddress: airlineList[i].address,
-    //         sender: airlineList[i].address);
-    //     airlineList[i].isAirlineFunded = isFunded;
-    //   } catch (e) {
-    //     debugPrint(
-    //         'Failed to fund ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Error: ${e.message}');
-    //   }
-    // }
+    for (var i = 1; i < airlineList.length - 1; i++) {
+      try {
+        await service.fundAirline(
+            sender: airlineList[i].address,
+            credentials: airlineList[i].privateKey,
+            value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10));
+        bool isFunded = await service.isAirlineFunded(
+            airlineAddress: airlineList[i].address,
+            sender: airlineList[i].address);
+        airlineList[i].isAirlineFunded = isFunded;
+        debugPrint(
+            'Funded ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Result: $isFunded');
+      } catch (e) {
+        debugPrint(
+            'Failed to fund ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Error: ${e.message}');
+      }
+    }
 
-    // await Future.delayed(Duration(seconds: 4));
-    // debugPrint('---- Fifth Airline ----');
-    // // special case: 5th airline requires consensus
-    // final result = await service.registerAirline(
-    //     airlineAddress: airlineList[4].address, sender: airlineList[1].address);
-    // airlineList[4].isAirlineRegistered = result;
-    // try {
-    //   await service.fundAirline(
-    //       sender: airlineList[4].address,
-    //       credentials: airlineList[4].privateKey,
-    //       value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10));
-    //   bool isFunded = await service.isAirlineFunded(
-    //       airlineAddress: airlineList[4].address,
-    //       sender: airlineList[4].address);
-    //   airlineList[4].isAirlineFunded = isFunded;
-    // } catch (e) {
-    //   debugPrint(
-    //       'Failed funding and registering ${airlineList[4].actorName} Address: ${airlineList[4].address.hex} \n Error: ${e.message}');
-    // }
+    debugPrint('---- Fifth Airline ----');
+    Actor airlineToRegister = airlineList[4];
+    Actor airlineFour = airlineList[3];
+    Actor airlineThree = airlineList[2];
 
+    try {
+      await service.nominateAirline(
+          airlineAddress: airlineToRegister.address,
+          sender: airlineFour.address,
+          credentials: airlineFour.privateKey);
+    } catch (e) {
+      debugPrint(
+          'Failed to nominate fifth airline | Airline: ${airlineToRegister.address.hex} Error: ${e.message}');
+    }
+
+    try {
+      await service.registerAirline(
+          airlineAddress: airlineToRegister.address,
+          sender: airlineFour.address,
+          credentials: airlineFour.privateKey);
+    } catch (e) {
+      debugPrint(
+          'Failed to register fifth airline - vote 1 | Airline: ${airlineToRegister.address.hex} Error: ${e.message}');
+    }
+
+    try {
+      await service.registerAirline(
+          airlineAddress: airlineToRegister.address,
+          sender: airlineThree.address,
+          credentials: airlineThree.privateKey);
+    } catch (e) {
+      debugPrint(
+          'Failed to register fifth airline - vote 2 | Airline: ${airlineToRegister.address.hex} Error: ${e.message}');
+    }
+
+    bool result = await service.isAirlineRegistered(
+        airlineAddress: airlineToRegister.address,
+        sender: airlineToRegister.address);
+    airlineToRegister.isAirlineRegistered = result;
+
+    try {
+      await service.fundAirline(
+          sender: airlineToRegister.address,
+          credentials: airlineToRegister.privateKey,
+          value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10));
+      bool isFunded = await service.isAirlineFunded(
+          airlineAddress: airlineToRegister.address,
+          sender: airlineToRegister.address);
+      airlineList[4].isAirlineFunded = isFunded;
+    } catch (e) {
+      debugPrint(
+          'Failed funding and registering ${airlineList[4].actorName} Address: ${airlineList[4].address.hex} \n Error: ${e.message}');
+    }
     isAirlinesSetup = true;
-  }
-
-  void setupStreams() {
-    streamGroup = StreamGroup.broadcast();
-
-    contractEvents.forEach((key, contractEvent) {
-      Stream<FlightSuretyEvent> stream = service
-          .registerStream(contractEvent)
-          .map((List<dynamic> decodedData) {
-        Function f = contractData[key];
-        FlightSuretyEvent event = f(decodedData);
-        return event;
-      });
-      streamGroup.add(stream);
-    });
-
-    eventStream = streamGroup.stream.asObservable();
-
-    subscription = streamGroup.stream.listen(
-      (event) {
-        debugPrint("Event: ${event.toString()}");
-      },
-      onError: (e) {
-        debugPrint("Stream Error");
-      },
-      onDone: () {
-        debugPrint("Stream Done");
-        subscription.cancel();
-      },
-      cancelOnError: false,
-    );
   }
 }

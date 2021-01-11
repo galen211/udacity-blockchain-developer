@@ -117,7 +117,7 @@ class _OraclePageState extends State<OraclePage> {
                           TextEditingValue(
                               text: store.selectedFlight.status == null
                                   ? ''
-                                  : store.selectedFlight.getStatus()),
+                                  : store.selectedFlight.statusDescription()),
                         ),
                       ),
                     ),

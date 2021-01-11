@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_dapp/components/airline_details.dart';
 import 'package:flutter_dapp/components/date_input.dart';
 import 'package:flutter_dapp/components/permissioned_button.dart';
-import 'package:flutter_dapp/contract/account_store.dart';
+import 'package:flutter_dapp/contract/contract_store.dart';
 import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-
-import 'account_warning.dart';
+import 'package:web3dart/web3dart.dart';
 
 class AirlinePage extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class AirlinePage extends StatefulWidget {
 class _AirlinePageState extends State<AirlinePage> {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<AccountStore>(context);
+    final store = Provider.of<ContractStore>(context);
     return Observer(
       builder: (context) => Container(
         decoration: BoxDecoration(color: Colors.black87),
@@ -41,82 +41,10 @@ class _AirlinePageState extends State<AirlinePage> {
                 "Airline Details",
                 style: Theme.of(context).textTheme.headline6,
               ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Flexible(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Selected Account Address',
-                          ),
-                          readOnly: true,
-                          controller: TextEditingController.fromValue(
-                            TextEditingValue(
-                              text: store.selectedActor == null
-                                  ? ''
-                                  : store.selectedActor.address.hex,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Selected Account Name',
-                          ),
-                          readOnly: store?.selectedActor?.actorType ==
-                                  ActorType.Unassigned
-                              ? false
-                              : true,
-                          controller: TextEditingController.fromValue(
-                            TextEditingValue(
-                              text: store.selectedActor == null
-                                  ? ''
-                                  : store.selectedActor.actorName,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Funding Amount',
-                            suffix: Text('ETH'),
-                          ),
-                          readOnly: store?.selectedActor?.actorType ==
-                                  ActorType.Unassigned
-                              ? false
-                              : true,
-                          controller: TextEditingController.fromValue(
-                            TextEditingValue(
-                              text: store.selectedActor == null
-                                  ? ''
-                                  : store
-                                      .selectedActor.airlineFunding.getInEther
-                                      .toString(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              SizedBox(
+                height: 10,
               ),
-              AccountWarning(ActorType.Airline),
+              AirlineDetails(),
               SizedBox(
                 height: 20,
               ),
@@ -141,22 +69,36 @@ class _AirlinePageState extends State<AirlinePage> {
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        child: DropdownButtonFormField<Airport>(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Departure Airport',
                           ),
+                          isDense: true,
+                          isExpanded: true,
+                          value: null,
+                          items: store.airportsDropdown(),
+                          onChanged: (value) {
+                            store.proposedFlight.setDepartureAirport(value);
+                          },
                         ),
                       ),
                     ),
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        child: DropdownButtonFormField<Airport>(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Arrival Airport',
                           ),
+                          isDense: true,
+                          isExpanded: true,
+                          value: null,
+                          items: store.airportsDropdown(),
+                          onChanged: (value) {
+                            store.proposedFlight.setArrivalAirport(value);
+                          },
                         ),
                       ),
                     ),
@@ -166,40 +108,75 @@ class _AirlinePageState extends State<AirlinePage> {
               Expanded(
                 child: DateTimeInput(),
               ),
-              Expanded(
-                child: ButtonBar(
-                  alignment: MainAxisAlignment.start,
-                  overflowDirection: VerticalDirection.down,
-                  buttonPadding: EdgeInsets.all(20),
-                  children: [
-                    PermissionedButton(
-                        requiredRole: ActorType.Unassigned,
-                        action: () async =>
-                            await Future.delayed(Duration(seconds: 3))
-                                .then((_) => print('registerAirline')),
-                        buttonText: 'Register Airline',
-                        disableCondition:
-                            store.selectedActor?.isAirlineRegistered ?? false),
-                    PermissionedButton(
-                        requiredRole: ActorType.Airline,
-                        action: () async =>
-                            await Future.delayed(Duration(seconds: 3))
-                                .then((_) => print('fundAirline')),
-                        buttonText: 'Fund Airline',
-                        disableCondition:
-                            store.selectedActor?.isAirlineFunded ?? false),
-                    PermissionedButton(
+              Row(
+                children: [
+                  ButtonBar(
+                    alignment: MainAxisAlignment.start,
+                    overflowDirection: VerticalDirection.down,
+                    buttonPadding: EdgeInsets.all(20),
+                    children: [
+                      PermissionedButton(
+                          requiredRole: ActorType.Airline,
+                          action: () async {
+                            store.isTransactionPending = true;
+                            await store.registerAirline();
+                            store.isTransactionPending = false;
+                          },
+                          buttonText: 'Register Airline',
+                          disableCondition:
+                              !store.selectedActor.isAirlineRegistered),
+                      PermissionedButton(
                         requiredRole: ActorType.Airline,
                         action: () async {
-                          //store.isTransactionPending = true;
-                          //
-                          //store.isTransactionPending = false;
+                          store.isTransactionPending = true;
+                          await store.fundAirline();
+                          store.isTransactionPending = false;
                         },
-                        buttonText: 'Register Flight',
-                        disableCondition:
-                            store.selectedActor?.isAirlineFunded ?? false),
-                  ],
-                ),
+                        buttonText: 'Fund Airline',
+                      ),
+                      PermissionedButton(
+                          requiredRole: ActorType.Airline,
+                          action: () async {
+                            store.isTransactionPending = true;
+                            await store.registerFlight();
+                            store.isTransactionPending = false;
+                          },
+                          buttonText: 'Register Flight',
+                          disableCondition:
+                              !store.selectedActor.isAirlineFunded),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 300,
+                      ),
+                      child: TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Amount',
+                          labelText: 'Add Funding',
+                          suffix: Text('ETH'),
+                        ),
+                        onChanged: (value) {
+                          store.addAirlineFundingAmount =
+                              EtherAmount.fromUnitAndValue(
+                                  EtherUnit.ether, value ?? '0');
+                        },
+                        validator: (value) {
+                          try {
+                            BigInt.parse(value);
+                          } catch (e) {
+                            return 'Must be a number!';
+                          }
+                          return '';
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
