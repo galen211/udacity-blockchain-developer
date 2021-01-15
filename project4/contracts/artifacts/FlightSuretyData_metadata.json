@@ -528,11 +528,11 @@
 	},
 	"sources": {
 		"localhost/FlightSuretyData.sol": {
-			"keccak256": "0x39c4f8b480bef8d7bc7711a200a42ec766f2bdceeeecfdfe49decc8d7eb73a5c",
+			"keccak256": "0x187e5579fb582e644cdf6d4b2e55918be3e250634e0262a815aa1ef297021222",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://914ce412d196831b8599ac099f44510bcab57b0b4afee6e9404b5b78c9c7330d",
-				"dweb:/ipfs/QmfGujwnVs2m4s6P33SPkXCMzrbPRrbyU5gcoCcKmN5R3B"
+				"bzz-raw://fee19d881830e6b96e7e2f5ff22ecdf895c4328961e32ebe682ed5d04fd50320",
+				"dweb:/ipfs/QmZUB97ZYDUmt7MsRo9nqgdi4PmNtafCWB2tEnNFAybdPK"
 			]
 		},
 		"localhost/SafeMath.sol": {

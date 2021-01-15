@@ -6,8 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'carousel.dart';
-
 _launchURL() async {
   const url =
       'https://github.com/galen211/udacity-blockchain-developer/tree/master/project4';
@@ -49,7 +47,7 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
       backgroundColor: Colors.transparent,
-      body: ViewCarousel(),
+      body: Container(),
       bottomNavigationBar: BottomNavigationBar(
         iconSize: 15,
         unselectedItemColor: Colors.white70,
@@ -83,7 +81,7 @@ class _MainPageState extends State<MainPage> {
         selectedItemColor: Colors.blueAccent,
         onTap: (index) {
           setState(() {
-            store.selectPage(index);
+            store.selectedPageIndex = index;
           });
         },
       ),

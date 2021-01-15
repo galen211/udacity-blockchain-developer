@@ -17,141 +17,126 @@ class _SetupPageState extends State<SetupPage> {
   Widget build(BuildContext context) {
     final store = Provider.of<ContractStore>(context);
     return Observer(
-      builder: (context) => Container(
-        decoration: BoxDecoration(color: Colors.black87),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Center(
-                child: Text(
-                  'Scenario Setup',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Center(
+              child: Text(
+                'Scenario Setup',
+                style: Theme.of(context).textTheme.headline5,
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: 475,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'App Contract Address',
+                        suffixIcon: Icon(
+                          Icons.circle,
+                          color: store.isAppOperational
+                              ? Colors.green
+                              : Colors.red,
+                          size: 10,
+                        ),
                       ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'App Contract Address',
-                          suffixIcon: Icon(
-                            Icons.circle,
-                            color: store.isAppOperational
-                                ? Colors.green
-                                : Colors.red,
-                            size: 10,
-                          ),
-                        ),
-                        readOnly: true,
-                        controller: TextEditingController.fromValue(
-                          TextEditingValue(text: store.appContractAddress.hex),
-                        ),
+                      readOnly: true,
+                      controller: TextEditingController.fromValue(
+                        TextEditingValue(text: store.appContractAddress.hex),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: 475,
+                ),
+                Flexible(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Data Contract Address',
+                        suffixIcon: Icon(
+                          Icons.circle,
+                          color: store.isAppOperational
+                              ? Colors.green
+                              : Colors.red,
+                          size: 10,
+                        ),
                       ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Data Contract Address',
-                          suffixIcon: Icon(
-                            Icons.circle,
-                            color: store.isAppOperational
-                                ? Colors.green
-                                : Colors.red,
-                            size: 10,
-                          ),
-                        ),
-                        readOnly: true,
-                        controller: TextEditingController.fromValue(
-                          TextEditingValue(text: store.dataContractAddress.hex),
-                        ),
+                      readOnly: true,
+                      controller: TextEditingController.fromValue(
+                        TextEditingValue(text: store.dataContractAddress.hex),
                       ),
                     ),
                   ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Text(
-                  'App Controls',
-                  style: Theme.of(context).textTheme.headline6,
                 ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                'App Controls',
+                style: Theme.of(context).textTheme.headline6,
               ),
-              ButtonBar(
-                alignment: MainAxisAlignment.start,
-                overflowDirection: VerticalDirection.down,
-                buttonPadding: EdgeInsets.all(20),
-                children: [
-                  PermissionedButton(
+            ),
+            ButtonBar(
+              alignment: MainAxisAlignment.start,
+              overflowDirection: VerticalDirection.down,
+              buttonPadding: EdgeInsets.all(20),
+              children: [
+                PermissionedButton(
+                  requiredRole: ActorType.ContractOwner,
+                  action: () async {
+                    store.isTransactionPending = true;
+                    await store.setOperatingStatus();
+                    store.isTransactionPending = false;
+                  },
+                  buttonText: store.isAppOperational
+                      ? 'Disable Operation'
+                      : 'Enable Operation',
+                  disableCondition: store.isTransactionPending,
+                ),
+                PermissionedButton(
                     requiredRole: ActorType.ContractOwner,
                     action: () async {
                       store.isTransactionPending = true;
-                      await store.setOperatingStatus();
+                      await store.registerAllAirlines();
                       store.isTransactionPending = false;
                     },
-                    buttonText: store.isAppOperational
-                        ? 'Disable Operation'
-                        : 'Enable Operation',
-                    disableCondition: store.isTransactionPending,
-                  ),
-                  PermissionedButton(
-                      requiredRole: ActorType.ContractOwner,
-                      action: () async {
-                        store.isTransactionPending = true;
-                        await store.registerAllAirlines();
-                        store.isTransactionPending = false;
-                      },
-                      buttonText: 'Setup Airline Consortium',
-                      disableCondition: store.isAirlinesSetup ||
-                          store.isTransactionPending ||
-                          !store.isAppOperational),
-                  PermissionedButton(
-                      requiredRole: ActorType.ContractOwner,
-                      action: () async {
-                        store.isTransactionPending = true;
-                        await store.registerAllFlights();
-                        store.isTransactionPending = false;
-                      },
-                      buttonText: 'Register Flights',
-                      disableCondition: store.isFlightsRegistered ||
-                          store.isTransactionPending ||
-                          !store.isAppOperational),
-                ],
-              ),
-              Expanded(
+                    buttonText: 'Setup Airline Consortium',
+                    disableCondition: store.isAirlinesSetup ||
+                        store.isTransactionPending ||
+                        !store.isAppOperational),
+                PermissionedButton(
+                    requiredRole: ActorType.ContractOwner,
+                    action: () async {
+                      store.isTransactionPending = true;
+                      await store.registerAllFlights();
+                      store.isTransactionPending = false;
+                    },
+                    buttonText: 'Register Flights',
+                    disableCondition: store.allFlightsRegistered ||
+                        store.isTransactionPending ||
+                        !store.isAppOperational),
+              ],
+            ),
+            Flexible(
+                flex: 6,
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.white,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: EventLog(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: EventLog(),
+                )),
+          ],
         ),
       ),
     );

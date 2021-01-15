@@ -146,7 +146,7 @@ contract FlightSuretyData {
         requireCallerAuthorized
         returns (bool)
     {
-        return airlines[airlineAddress].status == AirlineStatus.Nominated;
+        return airlines[airlineAddress].status == AirlineStatus.Nominated || airlines[airlineAddress].status == AirlineStatus.Registered || airlines[airlineAddress].status == AirlineStatus.Funded;
     }
 
     function isAirlineRegistered(address airlineAddress)

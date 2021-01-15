@@ -1,6 +1,41 @@
 import 'package:web3dart/web3dart.dart';
 
-extension on Flight {}
+enum FlightStatus {
+  Unknown,
+  LateAirline,
+  LateWeather,
+  LateTechnical,
+  LateOther,
+  OnTime,
+}
+
+extension StatusDescription on FlightStatus {
+  String description() {
+    switch (this) {
+      case FlightStatus.Unknown:
+        return 'Unknown';
+        break;
+      case FlightStatus.LateAirline:
+        return 'Late Airline';
+        break;
+      case FlightStatus.LateWeather:
+        return 'Late Weather';
+        break;
+      case FlightStatus.LateTechnical:
+        return 'Late Technical';
+        break;
+      case FlightStatus.LateOther:
+        return 'Late Other';
+        break;
+      case FlightStatus.OnTime:
+        return 'On Time';
+        break;
+      default:
+        return 'Invalid Flight Status';
+        break;
+    }
+  }
+}
 
 class Flight {
   EthereumAddress airlineAddress;
@@ -16,6 +51,7 @@ class Flight {
   DateTime scheduledDeparture;
   DateTime scheduledArrival;
   int status;
+  FlightStatus flightStatus;
   bool registered;
   Airport departureAirport;
   Airport arrivalAirport;
@@ -31,7 +67,8 @@ class Flight {
     this.arrivalAirportName,
     this.scheduledDeparture,
     this.scheduledArrival,
-    this.status,
+    this.status = 0,
+    this.flightStatus = FlightStatus.Unknown,
     this.registered,
     this.departureGate,
     this.arrivalGate,
@@ -54,6 +91,7 @@ class Flight {
         'scheduledDeparture': scheduledDeparture.toIso8601String(),
         'scheduledArrival': scheduledArrival.toIso8601String(),
         'status': status,
+        'flightStatus': flightStatus.description(),
         'registered': registered,
       };
 
@@ -62,28 +100,29 @@ class Flight {
     return this.toJson().toString();
   }
 
-  String statusDescription() {
-    switch (status) {
+  void updateFlightStatus(int code) {
+    this.status = code;
+    switch (code) {
       case 0:
-        return 'Unknown';
+        this.flightStatus = FlightStatus.Unknown;
         break;
       case 10:
-        return 'On Time';
+        this.flightStatus = FlightStatus.OnTime;
         break;
       case 20:
-        return 'Late Due to Airline';
+        this.flightStatus = FlightStatus.LateAirline;
         break;
       case 30:
-        return 'Late Due to Weather';
+        this.flightStatus = FlightStatus.LateWeather;
         break;
       case 40:
-        return 'Late Due to Technical Problems';
+        this.flightStatus = FlightStatus.LateTechnical;
         break;
       case 50:
-        return 'Late Due to Other Causes';
+        this.flightStatus = FlightStatus.LateOther;
         break;
       default:
-        throw 'Unrecognized Flight Status Code: $status';
+        throw 'Unknown Flight Status Code';
     }
   }
 
@@ -97,6 +136,27 @@ class Flight {
     this.arrivalAirport = airport;
     this.arrivalIata = airport.airportIata;
     this.arrivalAirportName = airport.airportName;
+  }
+
+  static Flight nullFlight() {
+    Flight flight = Flight(
+      airlineAddress:
+          EthereumAddress.fromHex('0x0000000000000000000000000000000000000000'),
+      airlineName: '',
+      airlineIata: '',
+      flightIata: '',
+      departureIata: '',
+      arrivalIata: '',
+      departureAirportName: '',
+      arrivalAirportName: '',
+      departureGate: '',
+      arrivalGate: '',
+      scheduledDeparture: DateTime.now(),
+      scheduledArrival: DateTime.now(),
+      status: 0,
+      registered: false,
+    );
+    return flight;
   }
 }
 

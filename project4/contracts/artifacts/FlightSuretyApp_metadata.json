@@ -426,6 +426,25 @@
 						"type": "address"
 					}
 				],
+				"name": "isAirlineNominated",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "airlineAddress",
+						"type": "address"
+					}
+				],
 				"name": "isAirlineRegistered",
 				"outputs": [
 					{
@@ -779,19 +798,19 @@
 	},
 	"sources": {
 		"localhost/FlightSuretyApp.sol": {
-			"keccak256": "0x497f42af51d2e7de23812c5b3449ba1aeaa4802902ae6ee8cfb0adea9f724815",
+			"keccak256": "0xac73e3e9a2207b1956927c8217f466b923845d5c147c7b48a7f989346151c46c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://33366cf5b780d8c1ad2ddb7a7615c84b1f1380d35967e7dbcd1b03d62e786482",
-				"dweb:/ipfs/QmTVqB3w6skZ2RzGZNTi83y4gbwRr8XwSKbRYyq3Ucyp9M"
+				"bzz-raw://ace84af8f80349869813d3c53de56345ec7b4e33281f583ebdb5c7fbbca10c6c",
+				"dweb:/ipfs/QmYUtwU3kdrPBUuAYPibK1tyGDTs3siB1wgb3acb89sbeM"
 			]
 		},
 		"localhost/FlightSuretyData.sol": {
-			"keccak256": "0x39c4f8b480bef8d7bc7711a200a42ec766f2bdceeeecfdfe49decc8d7eb73a5c",
+			"keccak256": "0x187e5579fb582e644cdf6d4b2e55918be3e250634e0262a815aa1ef297021222",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://914ce412d196831b8599ac099f44510bcab57b0b4afee6e9404b5b78c9c7330d",
-				"dweb:/ipfs/QmfGujwnVs2m4s6P33SPkXCMzrbPRrbyU5gcoCcKmN5R3B"
+				"bzz-raw://fee19d881830e6b96e7e2f5ff22ecdf895c4328961e32ebe682ed5d04fd50320",
+				"dweb:/ipfs/QmZUB97ZYDUmt7MsRo9nqgdi4PmNtafCWB2tEnNFAybdPK"
 			]
 		},
 		"localhost/SafeMath.sol": {

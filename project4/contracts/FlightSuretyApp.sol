@@ -214,6 +214,15 @@ contract FlightSuretyApp {
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
 
+    function isAirlineNominated(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        returns (bool)
+    {
+        return flightData.isAirlineNominated(airlineAddress);
+    }
+
     function isAirlineRegistered(address airlineAddress)
         external
         view

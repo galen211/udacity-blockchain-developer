@@ -28,16 +28,18 @@ class PermissionedButton extends StatelessWidget {
     return Observer(
       builder: (context) => Tooltip(
         message: requiredRole.warningMessage(),
-        child: FlatButton(
-          color: Colors.blueAccent,
-          onPressed: (store.selectedActor == null ||
-                  store.selectedActor.actorType != requiredRole ||
-                  disableCondition ||
-                  !(unassignedRoleAllowed &&
-                      store.selectedActor.actorType == ActorType.Unassigned))
-              ? null
-              : action,
-          child: Text(buttonText),
+        child: ElevatedButton(
+          onPressed: (store.selectedActor.actorType == requiredRole ||
+                      (unassignedRoleAllowed &&
+                          (store.selectedActor.actorType ==
+                              ActorType.Unassigned))) &&
+                  !disableCondition
+              ? action
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(buttonText),
+          ),
         ),
       ),
     );

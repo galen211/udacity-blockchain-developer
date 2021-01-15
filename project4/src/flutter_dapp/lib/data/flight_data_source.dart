@@ -53,7 +53,7 @@ class FlightDataSource extends DataGridSource<Flight> {
         return flight.scheduledArrival;
         break;
       case 'status':
-        return flight.statusDescription();
+        return flight.flightStatus.description();
         break;
       case 'registered':
         return flight.registered;

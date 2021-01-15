@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/utility/theme.dart';
 
-enum FlightStatus {
-  Unknown,
-  LateAirline,
-  LateWeather,
-  LateTechnical,
-  LateOther,
-  OnTime,
-}
-
 enum ContractStatus { Paused, Operational }
 
 class App {
@@ -35,15 +26,6 @@ class App {
 
   ThemeData get theme => FlightSuretyTheme().theme;
   AssetImage get backgroundImage => AssetImage("assets/images/flight.jpg");
-
-  Map<int, String> statusCode = {
-    0: 'Unknown',
-    10: 'On Time',
-    20: 'Late Due to Airline',
-    30: 'Late Due to Weather',
-    40: 'Late Due to Technical Problems',
-    50: 'Late Due to Other Causes'
-  };
 
   // assumes 5 airlines, 5 passengers
   List<String> get passengerNames => List.from([

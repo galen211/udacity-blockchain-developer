@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:async/async.dart';
+import 'package:flutter_dapp/contract/account_store.dart';
 import 'package:flutter_dapp/contract/contract_service.dart';
+import 'package:flutter_dapp/contract/contract_store.dart';
 import 'package:flutter_dapp/contract/prerequisites.dart';
 import 'package:flutter_dapp/data/actor.dart';
 import 'package:flutter_dapp/data/events.dart';
+import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web3dart/web3dart.dart';
@@ -15,16 +18,17 @@ final App app = App.settings;
 Prerequisites prerequisites;
 
 Map<String, Actor> actors;
+Map<String, Actor> airlines;
+Map<String, Flight> flights;
+
 Map<EventType, ContractEvent> contractEvents;
 
 ContractService service;
-StreamGroup streamGroup;
-StreamSubscription streamSubscription;
+StreamGroup<FlightSuretyEvent> streamGroup;
+StreamSubscription<FlightSuretyEvent> streamSubscription;
 
-void printEvent(FilterEvent event) {
-  print(
-      "EVENT Address: ${event.address.hex}, Event: ${event.topics.toString()}, Data: ${event.data}");
-}
+AccountStore accountStore;
+ContractStore contractStore;
 
 void main() async {
   setUpAll(() async {
@@ -35,11 +39,17 @@ void main() async {
     await prerequisites.initializationDone;
 
     actors = prerequisites.nameToActor;
+    airlines = prerequisites.airlineCodeToActor;
+    flights = prerequisites.flightCodeToFlight;
     contractEvents = prerequisites.contractEvents;
+
     service = ContractService();
+    accountStore = AccountStore(service);
+    contractStore = ContractStore(accountStore);
   });
 
   tearDownAll(() {
+    streamSubscription.cancel();
     service.client.dispose();
   });
 
@@ -65,14 +75,19 @@ void main() async {
   test("Setup streams", () async {
     streamGroup = StreamGroup();
 
-    contractEvents.values.forEach((event) {
-      Stream stream = service.registerStream(event);
+    contractEvents.forEach((eventType, contractEvent) {
+      Stream<FlightSuretyEvent> stream = service
+          .registerStream(contractEvent)
+          .map((List<dynamic> decodedData) {
+        FlightSuretyEvent event = FlightSuretyEvent(eventType, decodedData);
+        return event;
+      });
       streamGroup.add(stream);
     });
 
     streamSubscription = streamGroup.stream.listen(
-      (event) {
-        printEvent(event);
+      (FlightSuretyEvent event) {
+        print(event.description());
       },
       onError: (e) {
         print("Error: ${e.toString()}");
@@ -115,123 +130,122 @@ void main() async {
     expect(result, false);
   });
 
-  test("First airline funding succeeds ", () async {
-    EtherAmount value = EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
-    await service.fundAirline(
-        sender: actors[AppActor.airline1].address,
-        credentials: actors[AppActor.airline1].privateKey,
-        value: value);
+  // test("First airline funding succeeds ", () async {
+  //   EtherAmount value = EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
+  //   await service.fundAirline(
+  //       sender: actors[AppActor.airline1].address,
+  //       credentials: actors[AppActor.airline1].privateKey,
+  //       value: value);
 
-    final result = await service.isAirlineFunded(
-        airlineAddress: actors[AppActor.airline1].address,
-        sender: actors[AppActor.airline1].address);
-    expect(result, true);
+  //   final result = await service.isAirlineFunded(
+  //       airlineAddress: actors[AppActor.airline1].address,
+  //       sender: actors[AppActor.airline1].address);
+  //   expect(result, true);
+  // });
 
-    // service.client.dispose();
-    // streamGroup.close();
-  });
+  test("Register all airlines scenario", () async {
+    await contractStore.registerAllAirlines();
 
-  test("Register airlines scenario", () async {
-    app.airlineNames.forEach((name) async {
-      final airline = actors[name].address;
-      final credentials = actors[name].privateKey;
+    List<Actor> airlineList = airlines.values.toList();
 
-      await service.registerAirline(
-          airlineAddress: airline, credentials: credentials);
-    });
+    await Future.forEach(airlineList, (airline) async {
+      final isNominated = await service.isAirlineRegistered(
+        airlineAddress: airline.address,
+        sender: airline.address,
+      );
 
-    // vote the 5th airline a second time
-    await service.registerAirline(
-        airlineAddress: actors[AppActor.airline5].address,
-        credentials: actors[AppActor.airline2].privateKey);
+      expect(isNominated, true);
 
-    app.airlineNames.forEach((name) async {
-      final airline = actors[name].address;
-      final sender = airline;
-      final r =
-          service.isAirlineRegistered(airlineAddress: airline, sender: sender);
-      expect(r, true);
-    });
-  });
+      final isRegistered = await service.isAirlineRegistered(
+        airlineAddress: airline.address,
+        sender: airline.address,
+      );
 
-  test("Fund airlines scenario", () async {
-    EtherAmount value = EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
+      expect(isRegistered, true);
 
-    app.airlineNames.forEach((name) async {
-      final airline = actors[name].address;
-      final credential = actors[name].privateKey;
-      await service.fundAirline(
-          sender: airline, credentials: credential, value: value);
-    });
+      final isFunded = await service.isAirlineFunded(
+        airlineAddress: airline.address,
+        sender: airline.address,
+      );
 
-    app.airlineNames.forEach((name) async {
-      final airline = actors[name].address;
-      final sender = airline;
-      final r = await service.isAirlineFunded(
-          airlineAddress: airline, sender: sender);
-      expect(r, true);
+      expect(isFunded, true);
     });
   });
 
-  // test("Register flight succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+  test("Register all flights succeeds", () async {
+    await contractStore.registerAllFlights();
 
-  // test("Is flight registered succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+    List<Flight> flightsToRegister = flights.values.toList();
+    List<bool> isFlightRegistered = [];
+    await Future.forEach(flightsToRegister, (flight) async {
+      bool result = await service.isFlightRegistered(
+        flight: flight,
+        sender: flight.airlineAddress,
+      );
+      isFlightRegistered.add(result);
+    });
 
-  // test("Official flight status succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+    bool success = isFlightRegistered.every((e) => true);
+    expect(success, true);
+  });
 
-  // test("Buy flight insurance succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+  test("Purchase flight insurance succeeds", () async {
+    final passenger = actors.values
+        .firstWhere((actor) => actor.actorType == ActorType.Passenger);
 
-  // test("Fetch flight status succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+    accountStore.selectedActor = passenger;
+    expect(accountStore.selectedActor == contractStore.selectedActor, true);
 
-  // test("Register Oracle succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+    final flight = flights.values.first;
+    contractStore.selectedFlight = flight;
 
-  // test("Is Oracle registered succeeds", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+    await contractStore.purchaseInsurance();
 
-  // test("Get my indexes succeeds for registered Oracle", () async {
-  //   final result = await service.isOperational(actors[AppActor.airline1].address);
-  //   expect(result, false);
-  // });
+    final isPassengerInsured = await service.isPassengerInsured(
+      flight: flight,
+      passengerAddress: passenger.address,
+      sender: passenger.address,
+    );
+
+    expect(isPassengerInsured, true);
+  });
+
+  test("Official flight status succeeds", () async {
+    final flight = flights.values.first;
+    contractStore.selectedFlight = flight;
+
+    final result = await service.officialFlightStatus(
+      flight: flight,
+      sender: flight.airlineAddress,
+    );
+
+    flight.updateFlightStatus(result);
+    expect(flight.flightStatus == FlightStatus.Unknown, true);
+  });
+
+  test("Fetch flight status succeeds", () async {
+    final flight = flights.values.first;
+    final passenger = actors.values
+        .firstWhere((actor) => actor.actorType == ActorType.Passenger);
+
+    await service.fetchFlightStatus(
+      flight: flight,
+      sender: passenger.address,
+      credentials: passenger.privateKey,
+    );
+
+    final isPaidOut = await service.isPaidOut(
+      flight: flight,
+      sender: passenger.address,
+    );
+
+    expect(isPaidOut, false);
+
+    final passengerBalance = await service.passengerBalance(
+      passenger: passenger.address,
+      sender: passenger.address,
+    );
+
+    expect(passengerBalance == EtherAmount.zero(), true);
+  });
 }
-
-// DeployedContract appContract;
-// DeployedContract dataContract;
-// EthereumAddress appContractAddress;
-// EthereumAddress dataContractAddress;
-// Map<String, ContractFunction> contractFunctions;
-// Map<String, ContractEvent> contractEvents;
-
-// appContract = prerequisites.appContract;
-// dataContract = prerequisites.dataContract;
-// appContractAddress = prerequisites.appContractAddress;
-// dataContractAddress = prerequisites.dataContractAddress;
-// contractFunctions = prerequisites.contractFunctions;
-// contractEvents = prerequisites.contractEvents;
-
-// test("Can send funds from airline 1 to contract owner", () async {
-//   EtherAmount value = EtherAmount.fromUnitAndValue(EtherUnit.ether, 1);
-//   await service.sendFunds(
-//       actors[AppActor.contractOwner].address,
-//       EtherAmount.fromUnitAndValue(EtherUnit.ether, 1),
-//       actors[AppActor.airline1].privateKey);
-// });

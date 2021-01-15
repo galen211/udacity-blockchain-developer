@@ -8,6 +8,13 @@
             "flutterMode": "debug", 
         },
         {
+            "name": "Run Flutter dApp (Release)",
+            "type": "dart",
+            "request": "launch",
+            "program": "${workspaceRoot}/src/flutter_dapp/lib/main.dart",
+            "flutterMode": "release", 
+        },
+        {
             "name": "Run Truffle Tests",
             "type": "node",
             "request": "launch",

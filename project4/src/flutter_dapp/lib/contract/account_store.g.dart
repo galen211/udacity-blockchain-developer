@@ -9,6 +9,13 @@ part of 'account_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$AccountStore on _AccountStore, Store {
+  Computed<Widget> _$selectedPageComputed;
+
+  @override
+  Widget get selectedPage =>
+      (_$selectedPageComputed ??= Computed<Widget>(() => super.selectedPage,
+              name: '_AccountStore.selectedPage'))
+          .value;
   Computed<bool> _$isAccountConnectedComputed;
 
   @override
@@ -84,19 +91,18 @@ mixin _$AccountStore on _AccountStore, Store {
     });
   }
 
-  final _$carouselControllerAtom =
-      Atom(name: '_AccountStore.carouselController');
+  final _$airlineChangedAtom = Atom(name: '_AccountStore.airlineChanged');
 
   @override
-  CarouselController get carouselController {
-    _$carouselControllerAtom.reportRead();
-    return super.carouselController;
+  bool get airlineChanged {
+    _$airlineChangedAtom.reportRead();
+    return super.airlineChanged;
   }
 
   @override
-  set carouselController(CarouselController value) {
-    _$carouselControllerAtom.reportWrite(value, super.carouselController, () {
-      super.carouselController = value;
+  set airlineChanged(bool value) {
+    _$airlineChangedAtom.reportWrite(value, super.airlineChanged, () {
+      super.airlineChanged = value;
     });
   }
 
@@ -117,40 +123,47 @@ mixin _$AccountStore on _AccountStore, Store {
     });
   }
 
+  final _$updateAirlineAsyncAction = AsyncAction('_AccountStore.updateAirline');
+
+  @override
+  Future<void> updateAirline(Actor actor) {
+    return _$updateAirlineAsyncAction.run(() => super.updateAirline(actor));
+  }
+
   final _$updateAirlineFundingAsyncAction =
       AsyncAction('_AccountStore.updateAirlineFunding');
 
   @override
-  Future<void> updateAirlineFunding() {
+  Future<void> updateAirlineFunding(Actor actor) {
     return _$updateAirlineFundingAsyncAction
-        .run(() => super.updateAirlineFunding());
+        .run(() => super.updateAirlineFunding(actor));
   }
 
   final _$updateAirlineVotesAsyncAction =
       AsyncAction('_AccountStore.updateAirlineVotes');
 
   @override
-  Future<void> updateAirlineVotes() {
+  Future<void> updateAirlineVotes(Actor actor) {
     return _$updateAirlineVotesAsyncAction
-        .run(() => super.updateAirlineVotes());
+        .run(() => super.updateAirlineVotes(actor));
   }
 
   final _$updateAirlineStatusAsyncAction =
       AsyncAction('_AccountStore.updateAirlineStatus');
 
   @override
-  Future<void> updateAirlineStatus() {
+  Future<void> updateAirlineStatus(Actor actor) {
     return _$updateAirlineStatusAsyncAction
-        .run(() => super.updateAirlineStatus());
+        .run(() => super.updateAirlineStatus(actor));
   }
 
   final _$updatePassengerBalanceAsyncAction =
       AsyncAction('_AccountStore.updatePassengerBalance');
 
   @override
-  Future<void> updatePassengerBalance() {
+  Future<void> updatePassengerBalance(Actor actor) {
     return _$updatePassengerBalanceAsyncAction
-        .run(() => super.updatePassengerBalance());
+        .run(() => super.updatePassengerBalance(actor));
   }
 
   final _$updateBalanceAsyncAction = AsyncAction('_AccountStore.updateBalance');
@@ -162,17 +175,6 @@ mixin _$AccountStore on _AccountStore, Store {
 
   final _$_AccountStoreActionController =
       ActionController(name: '_AccountStore');
-
-  @override
-  void selectPage(int index) {
-    final _$actionInfo = _$_AccountStoreActionController.startAction(
-        name: '_AccountStore.selectPage');
-    try {
-      return super.selectPage(index);
-    } finally {
-      _$_AccountStoreActionController.endAction(_$actionInfo);
-    }
-  }
 
   @override
   List<DropdownMenuItem<Actor>> accountsDropdown() {
@@ -191,8 +193,9 @@ mixin _$AccountStore on _AccountStore, Store {
 selectedActor: ${selectedActor},
 selectedPageIndex: ${selectedPageIndex},
 accountChanged: ${accountChanged},
-carouselController: ${carouselController},
+airlineChanged: ${airlineChanged},
 selectedAccountBalance: ${selectedAccountBalance},
+selectedPage: ${selectedPage},
 isAccountConnected: ${isAccountConnected},
 printedEtherAmount: ${printedEtherAmount},
 selectedAccountDescription: ${selectedAccountDescription},

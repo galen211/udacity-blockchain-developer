@@ -16,43 +16,51 @@ class WalletStatus extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: Text('Select Account'),
-            content: SingleChildScrollView(
-              child: Container(
-                height: 400,
-                width: 500,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DropdownButtonFormField<Actor>(
-                        hint: Text("Choose an account to use"),
-                        isDense: true,
-                        isExpanded: true,
-                        value: null,
-                        items: store.accountsDropdown(),
-                        onChanged: (value) {
-                          setState(() {
-                            store.accountChanged = false;
-                            store.selectedActor = value;
-                            store.accountChanged = true;
-                          });
-                        },
+            content: Container(
+              height: 400,
+              width: 500,
+              child: ListView(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DropdownButtonFormField<Actor>(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
                       ),
+                      hint: Text("Choose an account to use"),
+                      isDense: true,
+                      isExpanded: true,
+                      value: null,
+                      items: store.accountsDropdown(),
+                      onChanged: (value) {
+                        setState(() {
+                          store.accountChanged = false;
+                          store.selectedActor = value;
+                          store.accountChanged = true;
+                        });
+                      },
                     ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Center(
-                      child: AccountQr(),
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Center(
+                    child: AccountQr(),
+                  ),
+                ],
               ),
             ),
             actions: <Widget>[
-              TextButton(
-                child: Text('Disconnect'),
+              OutlineButton(
+                child: SizedBox(
+                  width: 150,
+                  height: 50,
+                  child: Center(
+                    child: Text('Disconnect'),
+                  ),
+                ),
                 onPressed: () {
                   store.selectedActor = Actor.nullActor();
                   Navigator.of(context).pop();
@@ -63,8 +71,14 @@ class WalletStatus extends StatelessWidget {
                   ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
                 },
               ),
-              TextButton(
-                child: Text('OK'),
+              OutlineButton(
+                child: SizedBox(
+                  width: 150,
+                  height: 50,
+                  child: Center(
+                    child: Text('OK'),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                   final snackBar = SnackBar(

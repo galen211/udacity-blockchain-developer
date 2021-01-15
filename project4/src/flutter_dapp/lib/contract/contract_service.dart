@@ -1,3 +1,6 @@
+//import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/html.dart';
+
 import 'dart:async';
 
 import 'package:flutter_dapp/contract/prerequisites.dart';
@@ -6,18 +9,19 @@ import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
-import 'package:web_socket_channel/html.dart';
 
 final App appConstants = App.settings;
 
 class ContractService {
   Web3Client client;
 
+  static const MAX_GAS = 500000;
+
   DeployedContract appContract;
   EthereumAddress appContractAddress;
 
-  DeployedContract dataContract;
-  EthereumAddress dataContractAddress;
+  // DeployedContract dataContract;
+  // EthereumAddress dataContractAddress;
 
   Map<String, ContractFunction> contractFunctions;
   Map<EventType, ContractEvent> contractEvents;
@@ -37,6 +41,7 @@ class ContractService {
     client = Web3Client(appConstants.ethRpcServer, http.Client(),
         socketConnector: () {
       return HtmlWebSocketChannel.connect(appConstants.wsUrl).cast<String>();
+      //return IOWebSocketChannel.connect(appConstants.wsUrl).cast<String>();
       // need to use HtmlWebSocketChannel bc web https://pub.dev/packages/web_socket_channel
     });
   }
@@ -75,10 +80,23 @@ class ContractService {
     await client.sendTransaction(
       credentials,
       Transaction.callContract(
-          contract: appContract,
-          function: contractFunctions['setOperationalStatus'],
-          parameters: [mode]),
+        contract: appContract,
+        function: contractFunctions['setOperationalStatus'],
+        parameters: [mode],
+        maxGas: MAX_GAS,
+      ),
+      fetchChainIdFromNetworkId: true,
     );
+  }
+
+  Future<bool> isAirlineNominated(
+      {EthereumAddress airlineAddress, EthereumAddress sender}) async {
+    final response = await client.call(
+        sender: sender,
+        contract: appContract,
+        function: contractFunctions['isAirlineNominated'],
+        params: [airlineAddress]);
+    return response[0] as bool;
   }
 
   Future<bool> isAirlineRegistered(
@@ -111,7 +129,9 @@ class ContractService {
         contract: appContract,
         function: contractFunctions['registerAirline'],
         parameters: [airlineAddress],
+        maxGas: MAX_GAS,
       ),
+      fetchChainIdFromNetworkId: true,
     );
   }
 
@@ -127,7 +147,9 @@ class ContractService {
         parameters: [],
         from: sender,
         value: oracleRegistrationFee,
+        maxGas: MAX_GAS,
       ),
+      fetchChainIdFromNetworkId: true,
     );
   }
 
@@ -143,7 +165,9 @@ class ContractService {
         parameters: [],
         from: sender,
         value: withdrawalAmount,
+        maxGas: MAX_GAS,
       ),
+      fetchChainIdFromNetworkId: true,
     );
   }
 
@@ -173,14 +197,18 @@ class ContractService {
       EthereumAddress sender,
       Credentials credentials}) async {
     await client.sendTransaction(
-        credentials,
-        Transaction.callContract(
-            contract: appContract,
-            function: contractFunctions['nominateAirline'],
-            parameters: [
-              airlineAddress,
-            ],
-            from: sender));
+      credentials,
+      Transaction.callContract(
+        contract: appContract,
+        function: contractFunctions['nominateAirline'],
+        parameters: [
+          airlineAddress,
+        ],
+        from: sender,
+        maxGas: MAX_GAS,
+      ),
+      fetchChainIdFromNetworkId: true,
+    );
   }
 
   Future<void> fundAirline(
@@ -188,28 +216,35 @@ class ContractService {
       Credentials credentials,
       EtherAmount value}) async {
     await client.sendTransaction(
-        credentials,
-        Transaction.callContract(
-            contract: appContract,
-            function: contractFunctions['fundAirline'],
-            parameters: [],
-            from: sender,
-            value: value));
+      credentials,
+      Transaction.callContract(
+        contract: appContract,
+        function: contractFunctions['fundAirline'],
+        parameters: [],
+        from: sender,
+        value: value,
+        maxGas: MAX_GAS,
+      ),
+      fetchChainIdFromNetworkId: true,
+    );
   }
 
   Future<void> registerFlight(
       {Flight flight, EthereumAddress sender, Credentials credentials}) async {
     await client.sendTransaction(
-        credentials,
-        Transaction.callContract(
-          contract: appContract,
-          function: contractFunctions['registerFlight'],
-          parameters: [
-            flight.flightIata,
-            BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
-          ],
-          from: sender,
-        ));
+      credentials,
+      Transaction.callContract(
+        contract: appContract,
+        function: contractFunctions['registerFlight'],
+        parameters: [
+          flight.flightIata,
+          BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
+        ],
+        from: sender,
+        maxGas: MAX_GAS,
+      ),
+      fetchChainIdFromNetworkId: true,
+    );
   }
 
   Future<bool> isFlightRegistered(
@@ -236,33 +271,40 @@ class ContractService {
       EthereumAddress sender,
       Credentials credentials}) async {
     await client.sendTransaction(
-        credentials,
-        Transaction.callContract(
-          contract: appContract,
-          function: contractFunctions['buyFlightInsurance'],
-          parameters: [
-            flight.airlineAddress,
-            flight.flightIata,
-            BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
-          ],
-          from: sender,
-          value: insuranceAmount,
-        ));
+      credentials,
+      Transaction.callContract(
+        contract: appContract,
+        function: contractFunctions['buyFlightInsurance'],
+        parameters: [
+          flight.airlineAddress,
+          flight.flightIata,
+          BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
+        ],
+        from: sender,
+        value: insuranceAmount,
+        maxGas: MAX_GAS,
+      ),
+      fetchChainIdFromNetworkId: true,
+    );
   }
 
   Future<void> fetchFlightStatus(
       {Flight flight, EthereumAddress sender, Credentials credentials}) async {
     await client.sendTransaction(
-        credentials,
-        Transaction.callContract(
-            contract: appContract,
-            function: contractFunctions['fetchFlightStatus'],
-            parameters: [
-              flight.airlineAddress,
-              flight.flightIata,
-              BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
-            ],
-            from: sender));
+      credentials,
+      Transaction.callContract(
+        contract: appContract,
+        function: contractFunctions['fetchFlightStatus'],
+        parameters: [
+          flight.airlineAddress,
+          flight.flightIata,
+          BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
+        ],
+        from: sender,
+        maxGas: MAX_GAS,
+      ),
+      fetchChainIdFromNetworkId: true,
+    );
   }
 
   Future<bool> isPassengerInsured(
@@ -295,7 +337,7 @@ class ContractService {
     return response[0] as bool;
   }
 
-  Future<FlightStatus> officialFlightStatus(
+  Future<int> officialFlightStatus(
       {Flight flight, EthereumAddress sender}) async {
     final response = await client.call(
         sender: sender,
@@ -306,29 +348,8 @@ class ContractService {
           flight.flightIata,
           BigInt.from(flight.scheduledDeparture.millisecondsSinceEpoch),
         ]);
-    int status = response[0] as int;
-    switch (status) {
-      case 0:
-        return FlightStatus.Unknown;
-        break;
-      case 10:
-        return FlightStatus.OnTime;
-        break;
-      case 20:
-        return FlightStatus.LateAirline;
-        break;
-      case 30:
-        return FlightStatus.LateWeather;
-        break;
-      case 40:
-        return FlightStatus.LateTechnical;
-        break;
-      case 50:
-        return FlightStatus.LateOther;
-        break;
-      default:
-        return FlightStatus.Unknown;
-    }
+    final result = response[0] as BigInt;
+    return result.toInt();
   }
 
   Future<EtherAmount> passengerBalance(

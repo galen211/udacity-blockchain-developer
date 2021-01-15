@@ -49,7 +49,7 @@ class _AppHomeState extends State<AppHome> {
   @override
   void initState() {
     super.initState();
-    themeMode = ThemeMode.dark;
+    themeMode = ThemeMode.light;
   }
 
   @override
@@ -60,6 +60,7 @@ class _AppHomeState extends State<AppHome> {
       title: appConstants.appBarTitleText,
       theme: FlexColorScheme.light(
         colors: FlexColor.schemes[usedFlexScheme].light,
+        appBarElevation: 12,
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
       ).toTheme.copyWith(
           textTheme: GoogleFonts.muliTextTheme(ThemeData.light().textTheme),
@@ -69,6 +70,7 @@ class _AppHomeState extends State<AppHome> {
               GoogleFonts.nunitoSansTextTheme(ThemeData.light().textTheme)),
       darkTheme: FlexColorScheme.dark(
         colors: FlexColor.schemes[usedFlexScheme].dark,
+        appBarElevation: 12,
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
       ).toTheme.copyWith(
             textTheme: GoogleFonts.muliTextTheme(ThemeData.dark().textTheme),

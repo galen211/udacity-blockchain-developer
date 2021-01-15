@@ -72,33 +72,29 @@ abstract class _ContractStore with Store {
   void setupValidations() {
     _disposers = [
       autorun((_) async {
-        if (account.accountChanged) {
-          await account.updateAirlineFunding();
-          airlineFunding = account.selectedActor.airlineFunding;
-          await account.updateAirlineVotes();
-          airlineVotes = account.selectedActor.airlineVotes;
-          account.updateBalance(selectedActor);
+        if (selectedAirlineChanged) {
+          account.updateAirline(selectedAirline);
         }
       }),
       autorun((_) async {
         if (!isTransactionPending || actorType == ActorType.Airline) {
-          await account.updateAirlineFunding();
-          airlineFunding = account.selectedActor.airlineFunding;
-          await account.updateAirlineVotes();
-          airlineVotes = account.selectedActor.airlineVotes;
-          account.updateBalance(selectedActor);
-          await account.updateAirlineStatus();
+          await account.updateAirline(selectedActor);
         }
       }),
       autorun((_) async {
         if (!isTransactionPending || actorType == ActorType.Passenger) {
-          await account.updatePassengerBalance();
-          withdrawablePayout = account.selectedActor.withdrawablePayout;
-          account.updateBalance(selectedActor);
+          await account.updatePassengerBalance(selectedActor);
         }
       }),
     ];
   }
+
+  // contract variables
+  @observable
+  bool isAppOperational = true;
+
+  @observable
+  bool isTransactionPending = false;
 
   @observable
   ObservableStream eventStream;
@@ -108,28 +104,72 @@ abstract class _ContractStore with Store {
       ObservableList<FlightSuretyEvent>();
 
   @observable
-  bool isAppOperational = true;
+  bool updatePassenger;
 
   @observable
-  bool isTransactionPending = false;
+  bool updateAirline;
 
+  // scenario variables
   @observable
   bool isAirlinesSetup = false;
 
   @observable
-  bool isFlightsRegistered = false;
+  bool allFlightsRegistered = false;
+
+  // selected actor
+  @computed
+  bool get selectedAccountChanged => account.accountChanged;
+
+  @observable
+  EtherAmount withdrawablePayout = EtherAmount.zero();
+
+  @observable
+  EtherAmount addAirlineFundingAmount =
+      EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
+
+  @observable
+  DateTime selectedDate = DateTime.now();
+
+  @observable
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  @computed
+  Actor get selectedActor => account.selectedActor;
+
+  @computed
+  Membership get selectedActorMembership => selectedActor.airlineMembership;
+
+  @computed
+  int get selectedActorVotes => selectedActor.airlineVotes;
+
+  @computed
+  EtherAmount get selectedActorFunding => selectedActor.airlineFunding;
+
+  @computed
+  ActorType get actorType => selectedActor.actorType;
+
+  // selected airline
+  @observable
+  bool selectedAirlineChanged = false;
 
   @observable
   Actor selectedAirline = Actor.nullActor();
 
   @computed
-  ActorType get actorType => selectedActor.actorType;
+  Membership get selectedAirlineMembership => selectedAirline.airlineMembership;
 
+  @computed
+  int get selectedAirlineVotes => selectedAirline.airlineVotes;
+
+  @computed
+  EtherAmount get selectedAirlineFunding => selectedAirline.airlineFunding;
+
+  // flights
   @observable
   ObservableList<Flight> registeredFlights = ObservableList();
 
   @observable
-  Flight selectedFlight = Flight();
+  Flight selectedFlight = Flight.nullFlight();
 
   @observable
   Flight proposedFlight = Flight();
@@ -165,35 +205,10 @@ abstract class _ContractStore with Store {
     return dropdown;
   }
 
-  @observable
-  EtherAmount addAirlineFundingAmount =
-      EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
-
-  @observable
-  DateTime selectedDate = DateTime.now();
-
-  @observable
-  TimeOfDay selectedTime = TimeOfDay.now();
-
-  @computed
-  Actor get selectedActor => account.selectedActor;
-
-  @observable
-  EtherAmount withdrawablePayout = EtherAmount.zero();
-
-  @observable
-  int airlineVotes = 0;
-
-  @observable
-  EtherAmount airlineFunding = EtherAmount.zero();
-
-  @computed
-  String get airlineVotesString => airlineVotes.toString();
-
-  @computed
-  String get airlineFundingString =>
-      (airlineFunding.getValueInUnit(EtherUnit.finney) / 1000)
-          .toStringAsFixed(4);
+  @action
+  String etherAmountText(EtherAmount amount) {
+    return (amount.getValueInUnit(EtherUnit.finney) / 1000).toStringAsFixed(4);
+  }
 
   @action
   Future<bool> isContractOperational() async {
@@ -221,12 +236,25 @@ abstract class _ContractStore with Store {
   }
 
   @action
+  Future<void> nominateAirline() async {
+    try {
+      await service.nominateAirline(
+        airlineAddress: selectedAirline.address,
+        sender: selectedActor.address,
+        credentials: selectedActor.privateKey,
+      );
+    } catch (e) {
+      debugPrint('Unable to nominate airline');
+    }
+  }
+
+  @action
   Future<void> registerAirline() async {
     try {
       await service.registerFlight(
           flight: proposedFlight, credentials: selectedActor.privateKey);
     } catch (e) {
-      debugPrint('Register airline failed with ${e.message}');
+      debugPrint('Register airline failed with ${e.toString()}');
     }
   }
 
@@ -239,10 +267,10 @@ abstract class _ContractStore with Store {
           sender: selectedActor.address,
           credentials: selectedActor.privateKey,
           value: addAirlineFundingAmount);
-      await account.updateAirlineFunding();
+      await account.updateAirlineFunding(selectedActor);
       debugPrint("Funding succeeded");
     } catch (e) {
-      debugPrint('Fund airline failed with ${e.message}');
+      debugPrint('Fund airline failed with ${e.toString()}');
     }
   }
 
@@ -259,7 +287,7 @@ abstract class _ContractStore with Store {
     try {
       //await service.purchaseInsurance();
     } catch (e) {
-      debugPrint('Purchase insurance failed with ${e.message}');
+      debugPrint('Purchase insurance failed with ${e.toString()}');
     }
   }
 
@@ -295,7 +323,6 @@ abstract class _ContractStore with Store {
   Widget eventToWidget(BuildContext context, int index) {
     return Card(
       elevation: 8,
-      color: Colors.blueAccent,
       child: Padding(
         padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
         child: Row(
@@ -354,7 +381,9 @@ abstract class _ContractStore with Store {
   // Setup Functions
   @action
   Future<void> registerAllFlights() async {
-    flights.values.forEach((flight) async {
+    List<Flight> flightsToRegister = flights.values.toList();
+
+    await Future.forEach(flightsToRegister, (flight) async {
       EthereumAddress sender = airlines[flight.airlineIata].address;
       EthPrivateKey credentials = airlines[flight.airlineIata].privateKey;
       try {
@@ -363,17 +392,26 @@ abstract class _ContractStore with Store {
           sender: sender,
           credentials: credentials,
         );
+
         bool isRegistered = await service.isFlightRegistered(
             flight: flight, sender: flight.airlineAddress);
         flight.registered = isRegistered;
+
         debugPrint(
-            'Flight registered! ${flight.airlineAddress.hex} ${flight.flightIata} ${flight.scheduledDeparture.millisecondsSinceEpoch}');
+            'Registered flight ${flight.flightIata} Result: $isRegistered');
       } catch (e) {
         debugPrint(
             'Failed to register flight ${flight.flightIata} Error: ${e.toString()}');
       }
     });
-    isFlightsRegistered = true;
+
+    List<bool> isFlightRegistered = [];
+    if (isFlightRegistered.every((e) => true)) {
+      allFlightsRegistered = true;
+      debugPrint('Flight setup succeeded!');
+    } else {
+      debugPrint('Flight setup failed!');
+    }
   }
 
   @action
@@ -381,8 +419,7 @@ abstract class _ContractStore with Store {
     Actor firstAirline = airlines.values.first;
 
     // must fund first airline
-    debugPrint('---- First Airline ----');
-
+    debugPrint('---- Fund First Airline ----');
     try {
       await service.fundAirline(
           sender: firstAirline.address,
@@ -394,111 +431,85 @@ abstract class _ContractStore with Store {
           'Funded ${firstAirline.actorName} Address: ${firstAirline.address.hex} \n Result: $result');
     } catch (e) {
       debugPrint(
-          'failed to fund ${firstAirline.actorName} Address: ${firstAirline.address.hex} \n Error: ${e.message}');
+          'Failed to fund ${firstAirline.actorName} Address: ${firstAirline.address.hex} Error: ${e.toString()}');
     }
-
-    List<Actor> airlineList = airlines.values.toList();
 
     debugPrint('---- Registering Airlines ----');
+    List<Actor> airlinesToRegister = airlines.values.toList().sublist(1);
 
-    for (var i = 1; i < airlineList.length - 1; i++) {
-      Actor airlineToRegister = airlineList[i];
+    await Future.forEach(airlinesToRegister, (airline) async {
       try {
         await service.nominateAirline(
-            airlineAddress: airlineToRegister.address,
+            airlineAddress: airline.address,
             sender: firstAirline.address,
             credentials: firstAirline.privateKey);
-
-        await service.registerAirline(
-            airlineAddress: airlineToRegister.address,
-            sender: firstAirline.address,
-            credentials: firstAirline.privateKey);
-
-        bool result = await service.isAirlineRegistered(
-            airlineAddress: airlineToRegister.address,
-            sender: selectedActor.address);
-        airlineList[i].isAirlineRegistered = result;
-        debugPrint(
-            'Registered ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Result: $result');
       } catch (e) {
         debugPrint(
-            'Failed to register ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Error: ${e.toString()}');
+            'Failed to nominate ${airline.actorName} Address: ${airline.address.hex}} Error: ${e.toString()}');
       }
-    }
+    });
 
-    debugPrint('---- Funding Airlines ----');
+    await Future.forEach(airlinesToRegister, (airline) async {
+      try {
+        await service.registerAirline(
+            airlineAddress: airline.address,
+            sender: firstAirline.address,
+            credentials: firstAirline.privateKey);
+      } catch (e) {
+        debugPrint(
+            'Failed to register ${airline.actorName} Address: ${airline.address.hex}} Error: ${e.toString()}');
+      }
+    });
 
-    for (var i = 1; i < airlineList.length - 1; i++) {
+    await Future.forEach(airlinesToRegister.sublist(0, 3), (airline) async {
       try {
         await service.fundAirline(
-            sender: airlineList[i].address,
-            credentials: airlineList[i].privateKey,
+            sender: airline.address,
+            credentials: airline.privateKey,
             value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10));
-        bool isFunded = await service.isAirlineFunded(
-            airlineAddress: airlineList[i].address,
-            sender: airlineList[i].address);
-        airlineList[i].isAirlineFunded = isFunded;
-        debugPrint(
-            'Funded ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Result: $isFunded');
       } catch (e) {
         debugPrint(
-            'Failed to fund ${airlineList[i].actorName} Address: ${airlineList[i].address.hex} \n Error: ${e.message}');
+            'Failed to fund ${airline.actorName} Address: ${airline.address.hex} Error: ${e.toString()}');
       }
-    }
+    });
 
-    debugPrint('---- Fifth Airline ----');
-    Actor airlineToRegister = airlineList[4];
-    Actor airlineFour = airlineList[3];
-    Actor airlineThree = airlineList[2];
-
-    try {
-      await service.nominateAirline(
-          airlineAddress: airlineToRegister.address,
-          sender: airlineFour.address,
-          credentials: airlineFour.privateKey);
-    } catch (e) {
-      debugPrint(
-          'Failed to nominate fifth airline | Airline: ${airlineToRegister.address.hex} Error: ${e.message}');
-    }
-
+    // Fifth airline
+    Actor fifthAirline = airlinesToRegister.last;
+    Actor secondAirline = airlinesToRegister.first;
     try {
       await service.registerAirline(
-          airlineAddress: airlineToRegister.address,
-          sender: airlineFour.address,
-          credentials: airlineFour.privateKey);
+        airlineAddress: fifthAirline.address,
+        sender: secondAirline.address,
+        credentials: secondAirline.privateKey,
+      );
     } catch (e) {
       debugPrint(
-          'Failed to register fifth airline - vote 1 | Airline: ${airlineToRegister.address.hex} Error: ${e.message}');
+          'Failed to register ${fifthAirline.actorName} Address: ${fifthAirline.address.hex}} Error: ${e.toString()}');
     }
-
-    try {
-      await service.registerAirline(
-          airlineAddress: airlineToRegister.address,
-          sender: airlineThree.address,
-          credentials: airlineThree.privateKey);
-    } catch (e) {
-      debugPrint(
-          'Failed to register fifth airline - vote 2 | Airline: ${airlineToRegister.address.hex} Error: ${e.message}');
-    }
-
-    bool result = await service.isAirlineRegistered(
-        airlineAddress: airlineToRegister.address,
-        sender: airlineToRegister.address);
-    airlineToRegister.isAirlineRegistered = result;
 
     try {
       await service.fundAirline(
-          sender: airlineToRegister.address,
-          credentials: airlineToRegister.privateKey,
-          value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10));
-      bool isFunded = await service.isAirlineFunded(
-          airlineAddress: airlineToRegister.address,
-          sender: airlineToRegister.address);
-      airlineList[4].isAirlineFunded = isFunded;
+        sender: fifthAirline.address,
+        credentials: fifthAirline.privateKey,
+        value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 10),
+      );
     } catch (e) {
       debugPrint(
-          'Failed funding and registering ${airlineList[4].actorName} Address: ${airlineList[4].address.hex} \n Error: ${e.message}');
+          'Failed to fund ${fifthAirline.actorName} Address: ${fifthAirline.address.hex} Error: ${e.toString()}');
     }
-    isAirlinesSetup = true;
+
+    List<bool> isFunded = [];
+    await Future.forEach(airlinesToRegister, (airline) async {
+      bool result = await service.isAirlineFunded(
+          airlineAddress: airline.address, sender: airline.address);
+      isFunded.add(result);
+    });
+
+    if (isFunded.every((e) => true)) {
+      isAirlinesSetup = true;
+      debugPrint('Airline consortium setup succeeded!');
+    } else {
+      debugPrint('Airline consortium setup failed!');
+    }
   }
 }

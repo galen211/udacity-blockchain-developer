@@ -14,11 +14,18 @@ class _EventLogState extends State<EventLog> {
     final store = Provider.of<ContractStore>(context);
     return Observer(
       builder: (context) {
-        return ListView.builder(
-            itemCount: store.events.length,
-            itemBuilder: (BuildContext context, int index) {
-              return store.eventToWidget(context, index);
-            });
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(),
+            borderRadius: BorderRadius.circular(8),
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+          child: ListView.builder(
+              itemCount: store.events.length,
+              itemBuilder: (BuildContext context, int index) {
+                return store.eventToWidget(context, index);
+              }),
+        );
       },
     );
   }

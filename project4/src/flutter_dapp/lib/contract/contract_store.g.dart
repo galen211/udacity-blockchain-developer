@@ -9,13 +9,13 @@ part of 'contract_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ContractStore on _ContractStore, Store {
-  Computed<ActorType> _$actorTypeComputed;
+  Computed<bool> _$selectedAccountChangedComputed;
 
   @override
-  ActorType get actorType =>
-      (_$actorTypeComputed ??= Computed<ActorType>(() => super.actorType,
-              name: '_ContractStore.actorType'))
-          .value;
+  bool get selectedAccountChanged => (_$selectedAccountChangedComputed ??=
+          Computed<bool>(() => super.selectedAccountChanged,
+              name: '_ContractStore.selectedAccountChanged'))
+      .value;
   Computed<Actor> _$selectedActorComputed;
 
   @override
@@ -23,50 +23,58 @@ mixin _$ContractStore on _ContractStore, Store {
       (_$selectedActorComputed ??= Computed<Actor>(() => super.selectedActor,
               name: '_ContractStore.selectedActor'))
           .value;
-  Computed<String> _$airlineVotesStringComputed;
+  Computed<Membership> _$selectedActorMembershipComputed;
 
   @override
-  String get airlineVotesString => (_$airlineVotesStringComputed ??=
-          Computed<String>(() => super.airlineVotesString,
-              name: '_ContractStore.airlineVotesString'))
+  Membership get selectedActorMembership =>
+      (_$selectedActorMembershipComputed ??= Computed<Membership>(
+              () => super.selectedActorMembership,
+              name: '_ContractStore.selectedActorMembership'))
+          .value;
+  Computed<int> _$selectedActorVotesComputed;
+
+  @override
+  int get selectedActorVotes => (_$selectedActorVotesComputed ??= Computed<int>(
+          () => super.selectedActorVotes,
+          name: '_ContractStore.selectedActorVotes'))
       .value;
-  Computed<String> _$airlineFundingStringComputed;
+  Computed<EtherAmount> _$selectedActorFundingComputed;
 
   @override
-  String get airlineFundingString => (_$airlineFundingStringComputed ??=
-          Computed<String>(() => super.airlineFundingString,
-              name: '_ContractStore.airlineFundingString'))
+  EtherAmount get selectedActorFunding => (_$selectedActorFundingComputed ??=
+          Computed<EtherAmount>(() => super.selectedActorFunding,
+              name: '_ContractStore.selectedActorFunding'))
       .value;
-
-  final _$eventStreamAtom = Atom(name: '_ContractStore.eventStream');
-
-  @override
-  ObservableStream<dynamic> get eventStream {
-    _$eventStreamAtom.reportRead();
-    return super.eventStream;
-  }
+  Computed<ActorType> _$actorTypeComputed;
 
   @override
-  set eventStream(ObservableStream<dynamic> value) {
-    _$eventStreamAtom.reportWrite(value, super.eventStream, () {
-      super.eventStream = value;
-    });
-  }
-
-  final _$eventsAtom = Atom(name: '_ContractStore.events');
+  ActorType get actorType =>
+      (_$actorTypeComputed ??= Computed<ActorType>(() => super.actorType,
+              name: '_ContractStore.actorType'))
+          .value;
+  Computed<Membership> _$selectedAirlineMembershipComputed;
 
   @override
-  ObservableList<FlightSuretyEvent> get events {
-    _$eventsAtom.reportRead();
-    return super.events;
-  }
+  Membership get selectedAirlineMembership =>
+      (_$selectedAirlineMembershipComputed ??= Computed<Membership>(
+              () => super.selectedAirlineMembership,
+              name: '_ContractStore.selectedAirlineMembership'))
+          .value;
+  Computed<int> _$selectedAirlineVotesComputed;
 
   @override
-  set events(ObservableList<FlightSuretyEvent> value) {
-    _$eventsAtom.reportWrite(value, super.events, () {
-      super.events = value;
-    });
-  }
+  int get selectedAirlineVotes => (_$selectedAirlineVotesComputed ??=
+          Computed<int>(() => super.selectedAirlineVotes,
+              name: '_ContractStore.selectedAirlineVotes'))
+      .value;
+  Computed<EtherAmount> _$selectedAirlineFundingComputed;
+
+  @override
+  EtherAmount get selectedAirlineFunding =>
+      (_$selectedAirlineFundingComputed ??= Computed<EtherAmount>(
+              () => super.selectedAirlineFunding,
+              name: '_ContractStore.selectedAirlineFunding'))
+          .value;
 
   final _$isAppOperationalAtom = Atom(name: '_ContractStore.isAppOperational');
 
@@ -100,6 +108,66 @@ mixin _$ContractStore on _ContractStore, Store {
     });
   }
 
+  final _$eventStreamAtom = Atom(name: '_ContractStore.eventStream');
+
+  @override
+  ObservableStream<dynamic> get eventStream {
+    _$eventStreamAtom.reportRead();
+    return super.eventStream;
+  }
+
+  @override
+  set eventStream(ObservableStream<dynamic> value) {
+    _$eventStreamAtom.reportWrite(value, super.eventStream, () {
+      super.eventStream = value;
+    });
+  }
+
+  final _$eventsAtom = Atom(name: '_ContractStore.events');
+
+  @override
+  ObservableList<FlightSuretyEvent> get events {
+    _$eventsAtom.reportRead();
+    return super.events;
+  }
+
+  @override
+  set events(ObservableList<FlightSuretyEvent> value) {
+    _$eventsAtom.reportWrite(value, super.events, () {
+      super.events = value;
+    });
+  }
+
+  final _$updatePassengerAtom = Atom(name: '_ContractStore.updatePassenger');
+
+  @override
+  bool get updatePassenger {
+    _$updatePassengerAtom.reportRead();
+    return super.updatePassenger;
+  }
+
+  @override
+  set updatePassenger(bool value) {
+    _$updatePassengerAtom.reportWrite(value, super.updatePassenger, () {
+      super.updatePassenger = value;
+    });
+  }
+
+  final _$updateAirlineAtom = Atom(name: '_ContractStore.updateAirline');
+
+  @override
+  bool get updateAirline {
+    _$updateAirlineAtom.reportRead();
+    return super.updateAirline;
+  }
+
+  @override
+  set updateAirline(bool value) {
+    _$updateAirlineAtom.reportWrite(value, super.updateAirline, () {
+      super.updateAirline = value;
+    });
+  }
+
   final _$isAirlinesSetupAtom = Atom(name: '_ContractStore.isAirlinesSetup');
 
   @override
@@ -115,19 +183,100 @@ mixin _$ContractStore on _ContractStore, Store {
     });
   }
 
-  final _$isFlightsRegisteredAtom =
-      Atom(name: '_ContractStore.isFlightsRegistered');
+  final _$allFlightsRegisteredAtom =
+      Atom(name: '_ContractStore.allFlightsRegistered');
 
   @override
-  bool get isFlightsRegistered {
-    _$isFlightsRegisteredAtom.reportRead();
-    return super.isFlightsRegistered;
+  bool get allFlightsRegistered {
+    _$allFlightsRegisteredAtom.reportRead();
+    return super.allFlightsRegistered;
   }
 
   @override
-  set isFlightsRegistered(bool value) {
-    _$isFlightsRegisteredAtom.reportWrite(value, super.isFlightsRegistered, () {
-      super.isFlightsRegistered = value;
+  set allFlightsRegistered(bool value) {
+    _$allFlightsRegisteredAtom.reportWrite(value, super.allFlightsRegistered,
+        () {
+      super.allFlightsRegistered = value;
+    });
+  }
+
+  final _$withdrawablePayoutAtom =
+      Atom(name: '_ContractStore.withdrawablePayout');
+
+  @override
+  EtherAmount get withdrawablePayout {
+    _$withdrawablePayoutAtom.reportRead();
+    return super.withdrawablePayout;
+  }
+
+  @override
+  set withdrawablePayout(EtherAmount value) {
+    _$withdrawablePayoutAtom.reportWrite(value, super.withdrawablePayout, () {
+      super.withdrawablePayout = value;
+    });
+  }
+
+  final _$addAirlineFundingAmountAtom =
+      Atom(name: '_ContractStore.addAirlineFundingAmount');
+
+  @override
+  EtherAmount get addAirlineFundingAmount {
+    _$addAirlineFundingAmountAtom.reportRead();
+    return super.addAirlineFundingAmount;
+  }
+
+  @override
+  set addAirlineFundingAmount(EtherAmount value) {
+    _$addAirlineFundingAmountAtom
+        .reportWrite(value, super.addAirlineFundingAmount, () {
+      super.addAirlineFundingAmount = value;
+    });
+  }
+
+  final _$selectedDateAtom = Atom(name: '_ContractStore.selectedDate');
+
+  @override
+  DateTime get selectedDate {
+    _$selectedDateAtom.reportRead();
+    return super.selectedDate;
+  }
+
+  @override
+  set selectedDate(DateTime value) {
+    _$selectedDateAtom.reportWrite(value, super.selectedDate, () {
+      super.selectedDate = value;
+    });
+  }
+
+  final _$selectedTimeAtom = Atom(name: '_ContractStore.selectedTime');
+
+  @override
+  TimeOfDay get selectedTime {
+    _$selectedTimeAtom.reportRead();
+    return super.selectedTime;
+  }
+
+  @override
+  set selectedTime(TimeOfDay value) {
+    _$selectedTimeAtom.reportWrite(value, super.selectedTime, () {
+      super.selectedTime = value;
+    });
+  }
+
+  final _$selectedAirlineChangedAtom =
+      Atom(name: '_ContractStore.selectedAirlineChanged');
+
+  @override
+  bool get selectedAirlineChanged {
+    _$selectedAirlineChangedAtom.reportRead();
+    return super.selectedAirlineChanged;
+  }
+
+  @override
+  set selectedAirlineChanged(bool value) {
+    _$selectedAirlineChangedAtom
+        .reportWrite(value, super.selectedAirlineChanged, () {
+      super.selectedAirlineChanged = value;
     });
   }
 
@@ -192,99 +341,6 @@ mixin _$ContractStore on _ContractStore, Store {
     });
   }
 
-  final _$addAirlineFundingAmountAtom =
-      Atom(name: '_ContractStore.addAirlineFundingAmount');
-
-  @override
-  EtherAmount get addAirlineFundingAmount {
-    _$addAirlineFundingAmountAtom.reportRead();
-    return super.addAirlineFundingAmount;
-  }
-
-  @override
-  set addAirlineFundingAmount(EtherAmount value) {
-    _$addAirlineFundingAmountAtom
-        .reportWrite(value, super.addAirlineFundingAmount, () {
-      super.addAirlineFundingAmount = value;
-    });
-  }
-
-  final _$selectedDateAtom = Atom(name: '_ContractStore.selectedDate');
-
-  @override
-  DateTime get selectedDate {
-    _$selectedDateAtom.reportRead();
-    return super.selectedDate;
-  }
-
-  @override
-  set selectedDate(DateTime value) {
-    _$selectedDateAtom.reportWrite(value, super.selectedDate, () {
-      super.selectedDate = value;
-    });
-  }
-
-  final _$selectedTimeAtom = Atom(name: '_ContractStore.selectedTime');
-
-  @override
-  TimeOfDay get selectedTime {
-    _$selectedTimeAtom.reportRead();
-    return super.selectedTime;
-  }
-
-  @override
-  set selectedTime(TimeOfDay value) {
-    _$selectedTimeAtom.reportWrite(value, super.selectedTime, () {
-      super.selectedTime = value;
-    });
-  }
-
-  final _$withdrawablePayoutAtom =
-      Atom(name: '_ContractStore.withdrawablePayout');
-
-  @override
-  EtherAmount get withdrawablePayout {
-    _$withdrawablePayoutAtom.reportRead();
-    return super.withdrawablePayout;
-  }
-
-  @override
-  set withdrawablePayout(EtherAmount value) {
-    _$withdrawablePayoutAtom.reportWrite(value, super.withdrawablePayout, () {
-      super.withdrawablePayout = value;
-    });
-  }
-
-  final _$airlineVotesAtom = Atom(name: '_ContractStore.airlineVotes');
-
-  @override
-  int get airlineVotes {
-    _$airlineVotesAtom.reportRead();
-    return super.airlineVotes;
-  }
-
-  @override
-  set airlineVotes(int value) {
-    _$airlineVotesAtom.reportWrite(value, super.airlineVotes, () {
-      super.airlineVotes = value;
-    });
-  }
-
-  final _$airlineFundingAtom = Atom(name: '_ContractStore.airlineFunding');
-
-  @override
-  EtherAmount get airlineFunding {
-    _$airlineFundingAtom.reportRead();
-    return super.airlineFunding;
-  }
-
-  @override
-  set airlineFunding(EtherAmount value) {
-    _$airlineFundingAtom.reportWrite(value, super.airlineFunding, () {
-      super.airlineFunding = value;
-    });
-  }
-
   final _$isContractOperationalAsyncAction =
       AsyncAction('_ContractStore.isContractOperational');
 
@@ -301,6 +357,14 @@ mixin _$ContractStore on _ContractStore, Store {
   Future<void> setOperatingStatus() {
     return _$setOperatingStatusAsyncAction
         .run(() => super.setOperatingStatus());
+  }
+
+  final _$nominateAirlineAsyncAction =
+      AsyncAction('_ContractStore.nominateAirline');
+
+  @override
+  Future<void> nominateAirline() {
+    return _$nominateAirlineAsyncAction.run(() => super.nominateAirline());
   }
 
   final _$registerAirlineAsyncAction =
@@ -395,6 +459,17 @@ mixin _$ContractStore on _ContractStore, Store {
   }
 
   @override
+  String etherAmountText(EtherAmount amount) {
+    final _$actionInfo = _$_ContractStoreActionController.startAction(
+        name: '_ContractStore.etherAmountText');
+    try {
+      return super.etherAmountText(amount);
+    } finally {
+      _$_ContractStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void getFlights() {
     final _$actionInfo = _$_ContractStoreActionController.startAction(
         name: '_ContractStore.getFlights');
@@ -419,26 +494,32 @@ mixin _$ContractStore on _ContractStore, Store {
   @override
   String toString() {
     return '''
-eventStream: ${eventStream},
-events: ${events},
 isAppOperational: ${isAppOperational},
 isTransactionPending: ${isTransactionPending},
+eventStream: ${eventStream},
+events: ${events},
+updatePassenger: ${updatePassenger},
+updateAirline: ${updateAirline},
 isAirlinesSetup: ${isAirlinesSetup},
-isFlightsRegistered: ${isFlightsRegistered},
+allFlightsRegistered: ${allFlightsRegistered},
+withdrawablePayout: ${withdrawablePayout},
+addAirlineFundingAmount: ${addAirlineFundingAmount},
+selectedDate: ${selectedDate},
+selectedTime: ${selectedTime},
+selectedAirlineChanged: ${selectedAirlineChanged},
 selectedAirline: ${selectedAirline},
 registeredFlights: ${registeredFlights},
 selectedFlight: ${selectedFlight},
 proposedFlight: ${proposedFlight},
-addAirlineFundingAmount: ${addAirlineFundingAmount},
-selectedDate: ${selectedDate},
-selectedTime: ${selectedTime},
-withdrawablePayout: ${withdrawablePayout},
-airlineVotes: ${airlineVotes},
-airlineFunding: ${airlineFunding},
-actorType: ${actorType},
+selectedAccountChanged: ${selectedAccountChanged},
 selectedActor: ${selectedActor},
-airlineVotesString: ${airlineVotesString},
-airlineFundingString: ${airlineFundingString}
+selectedActorMembership: ${selectedActorMembership},
+selectedActorVotes: ${selectedActorVotes},
+selectedActorFunding: ${selectedActorFunding},
+actorType: ${actorType},
+selectedAirlineMembership: ${selectedAirlineMembership},
+selectedAirlineVotes: ${selectedAirlineVotes},
+selectedAirlineFunding: ${selectedAirlineFunding}
     ''';
   }
 }
