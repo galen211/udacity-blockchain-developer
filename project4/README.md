@@ -86,7 +86,29 @@ it("Cannot re-register an airline that has already been registered", async () =>
 ### Gas Estimation
 I used the `eth-gas-reporter` npm package to estimate gas costs.  Given the high gas costs a user would incur by calling these contracts, there is definitely room to improve the implementation.  The ![gas reporter file](fs-gas-report.rst) contains the measurements of gas consumption for the `flightSurety.js` tests.
 
-## Running the dApp
-The frontend of the dApp can be run locally by simply executing `npm run server` and `npm run dapp:prod`.  **Note:** in order for the dapp to run properly, the contracts must have been deployed by running `npx truffle deploy --reset`.  This will deploy the contracts onto a local Ethereum node.
+## dApp Screenshots
+I built the dApp frontend in flutter.  The app is located in the `src/flutter_dapp` folder.  The various screens contained in the dApp are shown and explained below:
 
-![Frontend Screenshot](img/flightsurety.png)
+### Scenario Setup
+In the scenario setup screen, the contract owner can set up an airline consortium of five airlines and register flights for each airline
+![Scenario Setup](img/screenshots/scenario_setup.png)
+
+### Actor Selection
+In the actor selection screen, the user of the dApp can switch between different dApp roles (i.e. Contract Owner, Airline, Passenger, Oracle or Unassigned).  In real life, you would not be able to do this, but this is a simulation, and the account switching functionality is not too different from what you might find in a wallet app like metamask.
+![Actor Selection](img/screenshots/actor_selection.png)
+
+### Airline Management
+In the airline management screen, airlines can register other airlines, flights, and fund themselves with Ether, which covers the potential insurance payouts.
+![Airline Management](img/screenshots/airline_management.png)
+
+### Passenger Screen
+In the passenger screen, a passenger can select a registered flight and purchase insurnace on it.
+![Passenger Screen](img/screenshots/passenger_screen.png)
+
+### Flight Status
+In the flight status screen, a passenger can check the withdrawable payout that they may have received on a flight that is delayed for certain reasons.  The frontend of the app requests the flight status from Oracles, and there is a node js server in the background which operates the oracles that fulfill the request.  The node server can be found in the `src/server` folder.
+![Flight Status](img/screenshots/flight_status.png)
+
+
+
+

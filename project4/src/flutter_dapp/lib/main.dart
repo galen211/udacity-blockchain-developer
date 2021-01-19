@@ -1,12 +1,15 @@
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/components/reactive_main_page.dart';
-import 'package:flutter_dapp/contract/account_store.dart';
-import 'package:flutter_dapp/contract/contract_service.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
-import 'package:flutter_dapp/contract/prerequisites.dart';
+import 'package:flutter_dapp/pages/reactive_main_page.dart';
+import 'package:flutter_dapp/prerequisites.dart';
+import 'package:flutter_dapp/stores/account_store.dart';
+import 'package:flutter_dapp/stores/contract_service.dart';
+import 'package:flutter_dapp/stores/contract_store.dart';
+import 'package:flutter_dapp/stores/event_store.dart';
+import 'package:flutter_dapp/stores/flight_data_store.dart';
+import 'package:flutter_dapp/stores/flight_registration_store.dart';
+import 'package:flutter_dapp/stores/settings_store.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 final App appConstants = App.settings;
@@ -26,10 +29,25 @@ class FlightSuretyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider(
-          create: (_) => AccountStore(contractService),
+          create: (_) => FlightDataStore(),
         ),
-        ProxyProvider<AccountStore, ContractStore>(
-            update: (_, account, __) => ContractStore(account))
+        Provider(
+          create: (_) => SettingsStore(),
+        ),
+        Provider(
+          create: (_) => EventStore(),
+        ),
+        ProxyProvider<FlightDataStore, AccountStore>(
+          update: (_, data, __) => AccountStore(contractService, data),
+        ),
+        ProxyProvider<AccountStore, FlightRegistrationStore>(
+          update: (_, account, __) => FlightRegistrationStore(account),
+        ),
+        ProxyProvider3<AccountStore, FlightDataStore, FlightRegistrationStore,
+            ContractStore>(
+          update: (_, account, data, flight, __) =>
+              ContractStore(account, data, flight),
+        ),
       ],
       child: AppHome(),
     );
@@ -44,54 +62,28 @@ class AppHome extends StatefulWidget {
 }
 
 class _AppHomeState extends State<AppHome> {
-  ThemeMode themeMode;
-
-  @override
-  void initState() {
-    super.initState();
-    themeMode = ThemeMode.light;
-  }
-
   @override
   Widget build(BuildContext context) {
-    const FlexScheme usedFlexScheme = FlexScheme.deepBlue;
-
-    return MaterialApp(
-      title: appConstants.appBarTitleText,
-      theme: FlexColorScheme.light(
-        colors: FlexColor.schemes[usedFlexScheme].light,
-        appBarElevation: 12,
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      ).toTheme.copyWith(
-          textTheme: GoogleFonts.muliTextTheme(ThemeData.light().textTheme),
-          primaryTextTheme:
-              GoogleFonts.robotoTextTheme(ThemeData.light().textTheme),
-          accentTextTheme:
-              GoogleFonts.nunitoSansTextTheme(ThemeData.light().textTheme)),
-      darkTheme: FlexColorScheme.dark(
-        colors: FlexColor.schemes[usedFlexScheme].dark,
-        appBarElevation: 12,
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      ).toTheme.copyWith(
-            textTheme: GoogleFonts.muliTextTheme(ThemeData.dark().textTheme),
-            primaryTextTheme:
-                GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme),
-            accentTextTheme:
-                GoogleFonts.nunitoSansTextTheme(ThemeData.dark().textTheme),
+    return Observer(builder: (_) {
+      final store = Provider.of<SettingsStore>(context);
+      return MaterialApp(
+        title: appConstants.appBarTitleText,
+        theme: store.lightTheme,
+        darkTheme: store.darkTheme,
+        themeMode: store.themeMode,
+        home: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: appConstants.backgroundImage, fit: BoxFit.cover),
           ),
-      themeMode: themeMode,
-      home: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              image: appConstants.backgroundImage, fit: BoxFit.cover),
+          child: Builder(
+            builder: (context) {
+              final store = Provider.of<ContractStore>(context);
+              return ReactiveMainPage(store);
+            },
+          ),
         ),
-        child: Builder(
-          builder: (context) {
-            final store = Provider.of<ContractStore>(context);
-            return ReactiveMainPage(store);
-          },
-        ),
-      ),
-    );
+      );
+    });
   }
 }

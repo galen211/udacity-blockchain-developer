@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/account_store.dart';
-import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/enums.dart';
+import 'package:flutter_dapp/stores/account_store.dart';
+import 'package:flutter_dapp/stores/actor_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -12,85 +13,97 @@ class WalletStatus extends StatelessWidget {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        final store = Provider.of<AccountStore>(context);
         return StatefulBuilder(
-          builder: (context, setState) => AlertDialog(
-            title: Text('Select Account'),
-            content: Container(
-              height: 400,
-              width: 500,
-              child: ListView(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField<Actor>(
+          builder: (context, setState) {
+            final store = Provider.of<AccountStore>(context);
+            return AlertDialog(
+              title: Text('Select Account'),
+              content: Container(
+                width: 500,
+                height: 400,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    DropdownButtonFormField<ActorStore>(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                       ),
                       hint: Text("Choose an account to use"),
-                      isDense: true,
                       isExpanded: true,
+                      isDense: true,
                       value: null,
-                      items: store.accountsDropdown(),
+                      items: store.accounts.values
+                          .map((account) => DropdownMenuItem<ActorStore>(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(account.actorName),
+                                    Chip(
+                                      backgroundColor: Theme.of(context)
+                                          .chipTheme
+                                          .selectedColor,
+                                      label: Text(
+                                        account.actorType.actorTypeName(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                value: account,
+                              ))
+                          .toList(),
                       onChanged: (value) {
                         setState(() {
                           store.accountChanged = false;
-                          store.selectedActor = value;
+                          store.selectedAccount = value;
                           store.accountChanged = true;
                         });
                       },
                     ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Center(
-                    child: AccountQr(),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              OutlineButton(
-                child: SizedBox(
-                  width: 150,
-                  height: 50,
-                  child: Center(
-                    child: Text('Disconnect'),
-                  ),
+                    AccountQr(),
+                  ],
                 ),
-                onPressed: () {
-                  store.selectedActor = Actor.nullActor();
-                  Navigator.of(context).pop();
-                  final snackBar = SnackBar(
-                    content: Text('Your account is now disconnected'),
-                    duration: Duration(seconds: 3),
-                  );
-                  ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
-                },
               ),
-              OutlineButton(
-                child: SizedBox(
-                  width: 150,
-                  height: 50,
-                  child: Center(
-                    child: Text('OK'),
+              actions: <Widget>[
+                OutlineButton(
+                  child: SizedBox(
+                    width: 150,
+                    height: 50,
+                    child: Center(
+                      child: Text('Disconnect'),
+                    ),
                   ),
+                  onPressed: () {
+                    store.selectedAccount = ActorStore();
+                    Navigator.of(context).pop();
+                    final snackBar = SnackBar(
+                      content: Text('Your account is now disconnected'),
+                      duration: Duration(seconds: 3),
+                    );
+                    ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
+                  },
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  final snackBar = SnackBar(
-                    content: Text(
-                        'You are now transacting as "${store.selectedActor.actorName}" at address: ${store.selectedActor.address.hex}'),
-                    duration: Duration(seconds: 3),
-                  );
-                  ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
-                },
-              ),
-            ],
-          ),
+                OutlineButton(
+                  child: SizedBox(
+                    width: 150,
+                    height: 50,
+                    child: Center(
+                      child: Text('OK'),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    final snackBar = SnackBar(
+                      content: Text(
+                          'You are now transacting as "${store.selectedAccount.actorName}" at address: ${store.selectedAccount.address.hex}'),
+                      duration: Duration(seconds: 3),
+                    );
+                    ScaffoldMessenger.maybeOf(context).showSnackBar(snackBar);
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );

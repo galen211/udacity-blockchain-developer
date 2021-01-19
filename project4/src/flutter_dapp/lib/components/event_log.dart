@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
+import 'package:flutter_dapp/stores/event_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +11,7 @@ class EventLog extends StatefulWidget {
 class _EventLogState extends State<EventLog> {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<ContractStore>(context);
+    final store = Provider.of<EventStore>(context);
     return Observer(
       builder: (context) {
         return Container(

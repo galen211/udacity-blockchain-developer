@@ -113,7 +113,9 @@ contract FlightSuretyData {
     uint256 public registeredAirlineCount = 0;
 
     // Enums
-    enum AirlineStatus {Nominated, Registered, Funded}
+    enum AirlineStatus {Nonmember, Nominated, Registered, Funded}
+    
+    AirlineStatus constant defaultStatus = AirlineStatus.Nonmember;
 
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
@@ -167,6 +169,15 @@ contract FlightSuretyData {
         returns (bool)
     {
         return airlines[airlineAddress].status == AirlineStatus.Funded;
+    }
+    
+    function airlineMembership(address airlineAddress)
+    external
+        view
+        requireIsOperational
+        returns (uint)
+    {
+        return uint(airlines[airlineAddress].status);
     }
 
     function nominateAirline(address airlineAddress)

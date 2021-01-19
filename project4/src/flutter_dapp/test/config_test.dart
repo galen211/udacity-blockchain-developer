@@ -5,8 +5,9 @@ import 'dart:io';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_dapp/data/accounts.dart';
-import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/enums.dart';
 import 'package:flutter_dapp/data/config.dart';
+import 'package:flutter_dapp/stores/actor_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
@@ -20,7 +21,7 @@ void main() async {
   String wsUrl = 'ws://localhost:8545';
 
   ConfigFile configFile;
-  List<Actor> actors;
+  List<ActorStore> actors;
 
   DeployedContract appContract;
   DeployedContract dataContract;
@@ -90,7 +91,7 @@ void main() async {
     final appIsOperational = appContract.function('isOperational');
     final dataIsOperational = dataContract.function('isOperational');
 
-    Actor contractOwner = actors
+    ActorStore contractOwner = actors
         .firstWhere((actor) => actor.actorType == ActorType.ContractOwner);
 
     final isAppOperational = await web3Client.call(
@@ -111,12 +112,12 @@ void main() async {
   });
 }
 
-List<Actor> setupActors(Accounts accounts) {
-  List<Actor> actors = [];
+List<ActorStore> setupActors(Accounts accounts) {
+  List<ActorStore> actors = [];
   accounts.privateKeys.forEach((key, value) {
     EthereumAddress address = EthereumAddress.fromHex(key);
     EthPrivateKey privateKey = EthPrivateKey.fromHex(value);
-    Actor actor = Actor(
+    ActorStore actor = ActorStore(
         address: address,
         privateKey: privateKey,
         actorType: ActorType.Unassigned);

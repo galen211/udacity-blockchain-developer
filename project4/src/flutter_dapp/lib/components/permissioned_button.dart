@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/account_store.dart';
-import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/enums.dart';
+import 'package:flutter_dapp/stores/account_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -29,9 +29,9 @@ class PermissionedButton extends StatelessWidget {
       builder: (context) => Tooltip(
         message: requiredRole.warningMessage(),
         child: ElevatedButton(
-          onPressed: (store.selectedActor.actorType == requiredRole ||
+          onPressed: (store.selectedAccount.actorType == requiredRole ||
                       (unassignedRoleAllowed &&
-                          (store.selectedActor.actorType ==
+                          (store.selectedAccount.actorType ==
                               ActorType.Unassigned))) &&
                   !disableCondition
               ? action

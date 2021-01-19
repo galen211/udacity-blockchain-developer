@@ -2,13 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:flutter_dapp/contract/account_store.dart';
-import 'package:flutter_dapp/contract/contract_service.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
-import 'package:flutter_dapp/contract/prerequisites.dart';
-import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/enums.dart';
 import 'package:flutter_dapp/data/events.dart';
-import 'package:flutter_dapp/data/flight.dart';
+import 'package:flutter_dapp/prerequisites.dart';
+import 'package:flutter_dapp/stores/account_store.dart';
+import 'package:flutter_dapp/stores/actor_store.dart';
+import 'package:flutter_dapp/stores/contract_service.dart';
+import 'package:flutter_dapp/stores/contract_store.dart';
+import 'package:flutter_dapp/stores/flight_data_store.dart';
+import 'package:flutter_dapp/stores/flight_registration_store.dart';
+import 'package:flutter_dapp/stores/flight_store.dart';
 import 'package:flutter_dapp/utility/app_constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web3dart/web3dart.dart';
@@ -17,9 +20,9 @@ final App app = App.settings;
 
 Prerequisites prerequisites;
 
-Map<String, Actor> actors;
-Map<String, Actor> airlines;
-Map<String, Flight> flights;
+FlightDataStore actors;
+Map<String, ActorStore> airlines;
+Map<String, FlightStore> flights;
 
 Map<EventType, ContractEvent> contractEvents;
 
@@ -29,6 +32,8 @@ StreamSubscription<FlightSuretyEvent> streamSubscription;
 
 AccountStore accountStore;
 ContractStore contractStore;
+FlightRegistrationStore registrationStore;
+FlightDataStore dataStore;
 
 void main() async {
   setUpAll(() async {
@@ -38,14 +43,12 @@ void main() async {
     prerequisites = Prerequisites();
     await prerequisites.initializationDone;
 
-    actors = prerequisites.nameToActor;
-    airlines = prerequisites.airlineCodeToActor;
-    flights = prerequisites.flightCodeToFlight;
     contractEvents = prerequisites.contractEvents;
 
     service = ContractService();
-    accountStore = AccountStore(service);
-    contractStore = ContractStore(accountStore);
+
+    accountStore = AccountStore(service, dataStore);
+    contractStore = ContractStore(accountStore, dataStore, registrationStore);
   });
 
   tearDownAll(() {
@@ -54,15 +57,15 @@ void main() async {
   });
 
   test("Print complete actor list", () {
-    actors.entries.forEach((actor) {
-      String address = actor.value.address.hex;
-      print('${actor.key}, address:  $address');
+    actors.accounts.values.forEach((actor) {
+      String address = actor.address.hex;
+      print('${actor.actorName}, address:  $address');
     });
     print('--------------------------------');
   });
 
   test("Print test details", () async {
-    Actor configOwner = actors[AppActor.contractOwner];
+    ActorStore configOwner = actors.accounts[AppActor.contractOwner];
     print('App contract address: ${service.appContract.address.hex}');
     final owner = await service.getContractOwner(sender: configOwner.address);
     print('App contract owner: ${owner.hex}');
@@ -101,52 +104,54 @@ void main() async {
 
   test("Can deactivate operating status", () async {
     await service.setOperatingStatus(
-        mode: false, credentials: actors[AppActor.contractOwner].privateKey);
+        mode: false,
+        credentials: actors.accounts[AppActor.contractOwner].privateKey);
 
     final result = await service.isOperational(
-        sender: actors[AppActor.contractOwner].address);
+        sender: actors.accounts[AppActor.contractOwner].address);
     expect(result, false);
   });
 
   test("Can re-activate operating status", () async {
     await service.setOperatingStatus(
-        mode: true, credentials: actors[AppActor.contractOwner].privateKey);
+        mode: true,
+        credentials: actors.accounts[AppActor.contractOwner].privateKey);
     final result = await service.isOperational(
-        sender: actors[AppActor.contractOwner].address);
+        sender: actors.accounts[AppActor.contractOwner].address);
     expect(result, true);
   });
 
   test("First airline already registered?", () async {
     final result = await service.isAirlineRegistered(
-        airlineAddress: actors[AppActor.airline1].address,
-        sender: actors[AppActor.contractOwner].address);
+        airlineAddress: actors.accounts[AppActor.airline1].address,
+        sender: actors.accounts[AppActor.contractOwner].address);
     expect(result, true);
   });
 
   test("Airline not funded on launch", () async {
     final result = await service.isAirlineFunded(
-        airlineAddress: actors[AppActor.airline1].address,
-        sender: actors[AppActor.airline1].address);
+        airlineAddress: actors.accounts[AppActor.airline1].address,
+        sender: actors.accounts[AppActor.airline1].address);
     expect(result, false);
   });
 
   // test("First airline funding succeeds ", () async {
   //   EtherAmount value = EtherAmount.fromUnitAndValue(EtherUnit.ether, 10);
   //   await service.fundAirline(
-  //       sender: actors[AppActor.airline1].address,
-  //       credentials: actors[AppActor.airline1].privateKey,
+  //       sender: actors.accounts[AppActor.airline1].address,
+  //       credentials: actors.accounts[AppActor.airline1].privateKey,
   //       value: value);
 
   //   final result = await service.isAirlineFunded(
-  //       airlineAddress: actors[AppActor.airline1].address,
-  //       sender: actors[AppActor.airline1].address);
+  //       airlineAddress: actors.accounts[AppActor.airline1].address,
+  //       sender: actors.accounts[AppActor.airline1].address);
   //   expect(result, true);
   // });
 
   test("Register all airlines scenario", () async {
     await contractStore.registerAllAirlines();
 
-    List<Actor> airlineList = airlines.values.toList();
+    List<ActorStore> airlineList = airlines.values.toList();
 
     await Future.forEach(airlineList, (airline) async {
       final isNominated = await service.isAirlineRegistered(
@@ -175,7 +180,7 @@ void main() async {
   test("Register all flights succeeds", () async {
     await contractStore.registerAllFlights();
 
-    List<Flight> flightsToRegister = flights.values.toList();
+    List<FlightStore> flightsToRegister = flights.values.toList();
     List<bool> isFlightRegistered = [];
     await Future.forEach(flightsToRegister, (flight) async {
       bool result = await service.isFlightRegistered(
@@ -190,11 +195,11 @@ void main() async {
   });
 
   test("Purchase flight insurance succeeds", () async {
-    final passenger = actors.values
+    final passenger = actors.accounts.values
         .firstWhere((actor) => actor.actorType == ActorType.Passenger);
 
-    accountStore.selectedActor = passenger;
-    expect(accountStore.selectedActor == contractStore.selectedActor, true);
+    accountStore.selectedAccount = passenger;
+    expect(accountStore.selectedAccount == contractStore.selectedActor, true);
 
     final flight = flights.values.first;
     contractStore.selectedFlight = flight;
@@ -225,7 +230,7 @@ void main() async {
 
   test("Fetch flight status succeeds", () async {
     final flight = flights.values.first;
-    final passenger = actors.values
+    final passenger = actors.accounts.values
         .firstWhere((actor) => actor.actorType == ActorType.Passenger);
 
     await service.fetchFlightStatus(

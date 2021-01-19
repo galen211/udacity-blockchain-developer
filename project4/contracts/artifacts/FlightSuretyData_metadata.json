@@ -22,6 +22,25 @@
 						"type": "address"
 					}
 				],
+				"name": "airlineMembership",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "airlineAddress",
+						"type": "address"
+					}
+				],
 				"name": "amountAirlineFunds",
 				"outputs": [
 					{
@@ -528,11 +547,11 @@
 	},
 	"sources": {
 		"localhost/FlightSuretyData.sol": {
-			"keccak256": "0x187e5579fb582e644cdf6d4b2e55918be3e250634e0262a815aa1ef297021222",
+			"keccak256": "0x267cf77f939b2db761ae9f5753b8eaad52c53a7e79981fbe6f4d77eaa872a999",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://fee19d881830e6b96e7e2f5ff22ecdf895c4328961e32ebe682ed5d04fd50320",
-				"dweb:/ipfs/QmZUB97ZYDUmt7MsRo9nqgdi4PmNtafCWB2tEnNFAybdPK"
+				"bzz-raw://b54010be2d414d99eb617fd3e315477d8759eb713353ad0ab56a56be428841a4",
+				"dweb:/ipfs/QmRgDTi8Pa2SrD7ZyP5UKgau13jbTYQK7VWNxbqBXFg7Jv"
 			]
 		},
 		"localhost/SafeMath.sol": {

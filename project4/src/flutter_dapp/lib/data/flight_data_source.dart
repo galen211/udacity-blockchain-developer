@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dapp/stores/flight_store.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'flight.dart';
+import 'enums.dart';
 
-class FlightDataSource extends DataGridSource<Flight> {
-  List<Flight> flights;
+class FlightDataSource extends DataGridSource<FlightStore> {
+  List<FlightStore> flights;
 
   FlightDataSource({@required this.flights});
 
   @override
-  List<Flight> get dataSource => flights;
+  List<FlightStore> get dataSource => flights;
 
   @override
-  Object getValue(Flight flight, String columnName) {
+  Object getValue(FlightStore flight, String columnName) {
     switch (columnName) {
       case 'airlineAddress':
         return flight.airlineAddress.hex;

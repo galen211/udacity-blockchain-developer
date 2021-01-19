@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/data/flight_file.dart' as File;
+import 'package:flutter_dapp/stores/flight_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web3dart/credentials.dart';
 
@@ -15,10 +15,10 @@ void main() async {
   });
 
   test("Put flights into order", () {
-    List<Flight> flightList = [];
+    List<FlightStore> flightList = [];
 
     file.data.forEach((f) {
-      Flight flight = Flight(
+      FlightStore flight = FlightStore(
         airlineAddress: EthereumAddress.fromHex(
             '0x197128a71474fad3a82cf639ec427fd285f561eb'),
         airlineName: f.airline.name,

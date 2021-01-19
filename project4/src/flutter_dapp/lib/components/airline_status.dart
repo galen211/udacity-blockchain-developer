@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
+import 'package:flutter_dapp/stores/contract_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +18,7 @@ class _AirlineStatusState extends State<AirlineStatus> {
         avatar: Icon(
           Icons.circle,
           color:
-              store.selectedActor.isAirlineFunded() ? Colors.green : Colors.red,
+              store.selectedActor.isAirlineFunded ? Colors.green : Colors.red,
           size: 15,
         ),
         onPressed: () {},

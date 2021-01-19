@@ -11,7 +11,8 @@
     "test": "truffle test ./test/flightSurety.js",
     "dapp": "webpack-dev-server --mode development --config webpack.config.dapp.js",
     "dapp:prod": "webpack --mode production  --config webpack.config.dapp.js",
-    "server": "rm -rf ./build/server && webpack --config webpack.config.server.js"
+    "server": "rm -rf ./build/server && webpack --config webpack.config.server.js",
+    "server:dev" : "rm -rf ./build/server && webpack --mode development --config webpack.config.server.js"
   },
   "author": "Galen Simmons",
   "devDependencies": {
@@ -47,6 +48,9 @@
     "webpack-node-externals": "1.7.2"
   },
   "dependencies": {
-    "web3-provider-engine": "^16.0.1"
+    "web3-provider-engine": "^16.0.1",
+    "express": "4.16.4",
+    "openzeppelin-solidity": "^2.2.0",
+    "lite-server": "^2.4.0"
   }
 }

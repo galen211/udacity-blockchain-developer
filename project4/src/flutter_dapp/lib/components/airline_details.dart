@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
-import 'package:flutter_dapp/data/actor.dart';
+import 'package:flutter_dapp/data/enums.dart';
+import 'package:flutter_dapp/stores/actor_store.dart';
+import 'package:flutter_dapp/stores/contract_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,7 @@ class _AirlineDetailsState extends State<AirlineDetails> {
                         flex: 3,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: DropdownButtonFormField<Actor>(
+                          child: DropdownButtonFormField<ActorStore>(
                             decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 labelText: 'Select Airline',
@@ -35,11 +36,16 @@ class _AirlineDetailsState extends State<AirlineDetails> {
                             isDense: true,
                             isExpanded: true,
                             value: null,
-                            items: store.airlinesDropdown(),
-                            onChanged: (value) {
-                              setState(() {
-                                store.selectedAirline = value;
-                              });
+                            items: store.airlines
+                                .map((airline) => DropdownMenuItem<ActorStore>(
+                                      child: Text(airline.actorName),
+                                      value: airline,
+                                    ))
+                                .toList(),
+                            onChanged: (airline) {
+                              debugPrint(
+                                  'selectedAirline: ${airline.actorName}');
+                              store.selectedAirline = airline;
                             },
                           ),
                         ),
@@ -74,9 +80,7 @@ class _AirlineDetailsState extends State<AirlineDetails> {
                                           .selectedAirline.actorName.length)),
                             ),
                             onChanged: (value) {
-                              setState(() {
-                                store.selectedAirline.updateActorName(value);
-                              });
+                              store.selectedAirline.actorName = value;
                             },
                           ),
                         ),
@@ -118,7 +122,7 @@ class _AirlineDetailsState extends State<AirlineDetails> {
                       readOnly: true,
                       controller: TextEditingController.fromValue(
                         TextEditingValue(
-                          text: '${store.selectedActorVotes}',
+                          text: '${store.selectedAirline.airlineVotes}',
                         ),
                       ),
                     ),

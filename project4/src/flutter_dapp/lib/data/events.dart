@@ -7,9 +7,11 @@ enum EventType {
   FlightRegistered,
   InsurancePurchased,
   InsurancePayout,
+  InsuranceWithdrawal,
   FlightStatusInfo,
   OracleReport,
   OracleRequest,
+  OracleRegistered,
 }
 
 extension EventTypeName on EventType {
@@ -33,14 +35,20 @@ extension EventTypeName on EventType {
       case EventType.InsurancePayout:
         return 'InsurancePayout';
         break;
+      case EventType.InsuranceWithdrawal:
+        return 'InsuranceWithdrawal';
+        break;
       case EventType.FlightStatusInfo:
         return 'FlightStatusInfo';
+        break;
+      case EventType.OracleRequest:
+        return 'OracleRequest';
         break;
       case EventType.OracleReport:
         return 'OracleReport';
         break;
-      case EventType.OracleRequest:
-        return 'OracleRequest';
+      case EventType.OracleRegistered:
+        return 'OracleRegistered';
         break;
       default:
         throw 'EventType ${this.toString()} not recognized';
@@ -101,14 +109,18 @@ abstract class FlightSuretyEvent {
         return InsurancePurchased(eventType, decodedData);
       case EventType.InsurancePayout:
         return InsurancePayout(eventType, decodedData);
+      case EventType.InsuranceWithdrawal:
+        return InsuranceWithdrawal(eventType, decodedData);
       case EventType.FlightStatusInfo:
         return FlightStatusInfo(eventType, decodedData);
       case EventType.OracleReport:
         return OracleReport(eventType, decodedData);
       case EventType.OracleRequest:
         return OracleRequest(eventType, decodedData);
+      case EventType.OracleRegistered:
+        return OracleRegistered(eventType, decodedData);
       default:
-        throw 'Cannot create event from given EventType ${eventType.eventName()} ';
+        throw 'Cannot create event from given EventType ${eventType.eventName()}';
     }
   }
 }
@@ -126,7 +138,7 @@ class AirlineNominated implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
+    buffer.write('Address: ${address.hex}');
     return buffer.toString();
   }
 }
@@ -144,7 +156,7 @@ class AirlineRegistered implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
+    buffer.write('Address: ${address.hex}');
     return buffer.toString();
   }
 }
@@ -164,8 +176,8 @@ class AirlineFunded implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Amount: ${this.etherAmountPrinted(amount)} ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Amount: ${this.etherAmountPrinted(amount)}');
     return buffer.toString();
   }
 }
@@ -185,8 +197,8 @@ class FlightRegistered implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Flight: $flight ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Flight: $flight');
     return buffer.toString();
   }
 }
@@ -206,8 +218,8 @@ class InsurancePurchased implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Amount: ${this.etherAmountPrinted(amount)} ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Amount: ${this.etherAmountPrinted(amount)}');
     return buffer.toString();
   }
 }
@@ -227,8 +239,8 @@ class InsurancePayout implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Flight: $flight ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Flight: $flight');
     return buffer.toString();
   }
 }
@@ -248,8 +260,8 @@ class InsuranceWithdrawal implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Amount: ${this.etherAmountPrinted(amount)} ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Amount: ${this.etherAmountPrinted(amount)}');
     return buffer.toString();
   }
 }
@@ -274,10 +286,11 @@ class FlightStatusInfo implements FlightSuretyEvent {
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Flight: $flight ');
-    buffer.write('Departure Time: ${departureTime.toIso8601String()} ');
-    buffer.write('Status: ${this.statusDescription(status)} ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Flight: $flight');
+    buffer.writeln(
+        'Departure Time: ${departureTime.millisecondsSinceEpoch} ${departureTime.toIso8601String()}');
+    buffer.write('Status: $status, ${this.statusDescription(status)}');
     return buffer.toString();
   }
 }
@@ -296,16 +309,16 @@ class OracleReport implements FlightSuretyEvent {
     flight = decodedData[1] as String;
     departureTime =
         DateTime.fromMillisecondsSinceEpoch((decodedData[2] as BigInt).toInt());
-    status = decodedData[3] as int;
+    status = (decodedData[3] as BigInt).toInt();
   }
 
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Flight: $flight ');
-    buffer.write('Departure Time: ${departureTime.toIso8601String()} ');
-    buffer.write('Status: ${this.statusDescription(status)} ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Flight: $flight');
+    buffer.write('Departure Time: ${departureTime.toIso8601String()}');
+    buffer.write('Status: ${this.statusDescription(status)}');
     return buffer.toString();
   }
 }
@@ -314,23 +327,25 @@ class OracleRequest implements FlightSuretyEvent {
   final List decodedData;
   final EventType eventType;
 
+  int index;
   EthereumAddress address;
   String flight;
   DateTime departureTime;
 
   OracleRequest(this.eventType, this.decodedData) {
-    address = decodedData[0] as EthereumAddress;
-    flight = decodedData[1] as String;
+    index = (decodedData[0] as BigInt).toInt();
+    address = decodedData[1] as EthereumAddress;
+    flight = decodedData[2] as String;
     departureTime =
-        DateTime.fromMillisecondsSinceEpoch((decodedData[2] as BigInt).toInt());
+        DateTime.fromMillisecondsSinceEpoch((decodedData[3] as BigInt).toInt());
   }
 
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Flight: $flight ');
-    buffer.write('Departure Time: ${departureTime.toIso8601String()} ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('Flight: $flight');
+    buffer.write('Departure Time: ${departureTime.toIso8601String()}');
     return buffer.toString();
   }
 }
@@ -344,17 +359,19 @@ class OracleRegistered implements FlightSuretyEvent {
 
   OracleRegistered(this.eventType, this.decodedData) {
     address = decodedData[0] as EthereumAddress;
-    indexes[0] = decodedData[1];
-    indexes[1] = decodedData[2];
+    indexes = (decodedData[1] as List<dynamic>)
+        .map((e) => e.toInt())
+        .toList()
+        .cast<int>();
   }
 
   @override
   String description() {
     StringBuffer buffer = StringBuffer();
-    buffer.write('Address: ${address.hex} ');
-    buffer.write('Indexes: ');
+    buffer.write('Address: ${address.hex}');
+    buffer.write('\t Indexes:');
     indexes.forEach((idx) {
-      buffer.write(idx);
+      buffer.write(' $idx');
     });
     return buffer.toString();
   }

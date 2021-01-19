@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dapp/contract/account_store.dart';
+import 'package:flutter_dapp/stores/account_store.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -24,7 +24,7 @@ class _AccountQrState extends State<AccountQr> {
             child: QrImage(
               padding: EdgeInsets.all(16),
               backgroundColor: Colors.white,
-              data: store.selectedActor.address.hex,
+              data: store.selectedAccount.address.hex,
               version: QrVersions.auto,
             ),
           ),
@@ -33,10 +33,10 @@ class _AccountQrState extends State<AccountQr> {
           padding: const EdgeInsets.all(8.0),
           child: TextButton.icon(
             icon: FaIcon(FontAwesomeIcons.clipboard),
-            label: Text(store.selectedActor.address.hex),
+            label: Text(store.selectedAccount.address.hex),
             onPressed: () {
               Clipboard.setData(
-                ClipboardData(text: store.selectedActor.address.hex),
+                ClipboardData(text: store.selectedAccount.address.hex),
               );
             },
           ),

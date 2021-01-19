@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dapp/contract/contract_store.dart';
-import 'package:flutter_dapp/data/flight.dart';
 import 'package:flutter_dapp/data/flight_data_source.dart';
+import 'package:flutter_dapp/stores/contract_store.dart';
+import 'package:flutter_dapp/stores/flight_store.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -17,8 +17,9 @@ class _FlightTableState extends State<FlightTable> {
   @override
   Widget build(BuildContext context) {
     final store = Provider.of<ContractStore>(context);
-    FlightDataSource _dataSource =
-        FlightDataSource(flights: store.registeredFlights.toList());
+    FlightDataSource _dataSource = FlightDataSource(
+        flights:
+            store.flights.values.where((flight) => flight.registered).toList());
 
     return Container(
       child: SfDataGrid(
@@ -28,11 +29,11 @@ class _FlightTableState extends State<FlightTable> {
           GridTextColumn(
               mappingName: 'flightIata',
               headerText: 'Flight',
-              columnWidthMode: ColumnWidthMode.auto),
+              columnWidthMode: ColumnWidthMode.fill),
           GridTextColumn(
               mappingName: 'airlineName',
               headerText: 'Airline',
-              columnWidthMode: ColumnWidthMode.auto),
+              columnWidthMode: ColumnWidthMode.fill),
           GridTextColumn(
               mappingName: 'departureAirportString', headerText: 'From'),
           GridTextColumn(mappingName: 'arrivalAirportString', headerText: 'To'),
@@ -41,17 +42,17 @@ class _FlightTableState extends State<FlightTable> {
               mappingName: 'scheduledDeparture',
               headerText: 'Departs At',
               dateFormat: DateFormat.yMd().add_jm(),
-              columnWidthMode: ColumnWidthMode.auto),
+              columnWidthMode: ColumnWidthMode.fill),
           GridDateTimeColumn(
               allowSorting: true,
               mappingName: 'scheduledArrival',
               headerText: 'Arrives At',
               dateFormat: DateFormat.yMd().add_jm(),
-              columnWidthMode: ColumnWidthMode.auto),
+              columnWidthMode: ColumnWidthMode.fill),
           GridTextColumn(
               mappingName: 'status',
               headerText: 'Status',
-              columnWidthMode: ColumnWidthMode.auto),
+              columnWidthMode: ColumnWidthMode.fill),
         ],
         source: _dataSource,
         selectionMode: SelectionMode.singleDeselect,
@@ -62,7 +63,7 @@ class _FlightTableState extends State<FlightTable> {
             if (addedRows.length > 0) {
               store.selectedFlight = addedRows[0];
             } else {
-              store.selectedFlight = Flight();
+              store.selectedFlight = FlightStore();
             }
           });
         },

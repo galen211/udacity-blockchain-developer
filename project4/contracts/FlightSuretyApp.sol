@@ -240,6 +240,15 @@ contract FlightSuretyApp {
     {
         return flightData.isAirlineFunded(airlineAddress);
     }
+    
+    function airlineMembership(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        returns (uint)
+    {
+        return flightData.airlineMembership(airlineAddress);
+    }
 
     function nominateAirline(address airlineAddress)
         external
