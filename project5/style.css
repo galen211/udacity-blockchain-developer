@@ -1,0 +1,95 @@
+body {
+    background-color:#fff;
+    padding: 2em;
+    font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+    color: white;
+    background-image:  url('dapp/real_estate.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+    position: center;
+  
+}
+.container {
+    width: 50%;
+    margin: 0 auto;
+    position: center;
+    background-color:#000000;
+    opacity:0.8;
+}
+
+
+.bold { 
+  font-weight: bolder;
+  
+}
+
+input {
+    width: 90%;
+    padding: 12px 20px;
+    margin: 10px 0;
+}
+
+select{
+    width: 95%;
+    padding: 12px 20px;
+    margin: 10px 0;
+}
+
+options {
+    display:none;
+    position:center;
+    top:100%;
+    right:0;
+    left:0;
+    z-index:999;
+    margin:0 0;
+    padding:0 0;
+    list-style:none;
+    border:1px solid #ccc;
+    background-color:white;
+    -webkit-box-shadow:0 1px 2px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow:0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow:0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    color: white;
+    background-color: #2272d3;
+    font-size: 16px;
+    padding: 16px 32px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+    display: inline;
+}
+
+.ftc-intro {
+  background-color:#0097A7;
+  color:white;
+  width:80%;
+  padding:20px;
+}
+
+.form-group {
+    color:white;
+    width:40%;
+    padding:30px;
+    border-radius: 4px;
+    background: rgb(75,46,59);
+    background: linear-gradient(12deg, rgba(75,46,59,0.87156869583771) 20%, rgba(24,24,37,1) 55%, rgb(36, 19, 190) 100%);
+    margin: 0 auto;
+    opacity:0.8;
+    position: center;
+}
+
+	
+.horizontal-rule {
+  background-color:#BDBDBD;
+}
+
+#button {
+  text-transform: uppercase;
+}

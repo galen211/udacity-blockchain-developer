@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Marketplace Project</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- loading the minified version -->
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Real Estate Marketplace</h1>
+        <hr>
+        <p style="text-align: center;">Helping you to get the right property.</p>
+    </div>
+
+    <div id="ftc-harvest">
+        
+        <div class="form-group">
+        <h2>Token View </h2>
+            Deployed SolnSquareVerifier Contract Owner:
+            <input type="text" id="contractOwner" value="0x0000000000000000000000000000000000000000" size="50" disabled="true"><br><br>
+           <br>
+           View Token Details
+           <br>
+            <input type="text" id="tokenId" placeholder="insert token id" size="50"><br><br>
+           Token Owner
+           <br>
+            <input type="text" id="tokenOwner" value="0x0000000000000000000000000000000000000000" size="50" disabled="true"><br><br>
+            Token URI
+            <br>
+            <input type="text" id="tokenURI" value="" size="50" disabled="true"><br><br>
+            Token balance for address
+            <br>
+            <input type="text" id="balanceOwner" placeholder="insert address here" size="50"><br><br>
+            Balance
+            <br>
+            <input type="text" id="tokenBalance" value="" size="50" disabled="true"><br><br>
+
+           <div class="button-div">
+                <button class="btn-fetchOne" type="button" data-id="0">Get Contract Owner</button>
+                <button class="btn-fetchOne" type="button" data-id="1">Get Token Details</button>
+                <button class="btn-fetchTwo" type="button" data-id="2">Get Token Balance</button>
+            </div>
+        </div>
+        <div class="form-break"></div>
+        <br>
+        <div class="form-group">
+            <h2>Approve Solution</h2>
+            Proof A [0]
+            <br>
+            <input type="text" id="proofA0" value="0xf0b673c6a8ce7211a1f48aac2d31f35aa474e8fc604b5209470c8c4204dcbb2" placeholder=" proof A [0]" size="50"><br>
+            Proof A [1]
+            <br>
+            <input type="text" id="proofA1" value="0x18cd7778235621714f6ff21b4c3a6e47854356e64083e233b88341aba6e99894" placeholder=" proof A [1]" size="50"><br>
+            Proof A_p [0]
+            <br>
+            <input type="text" id="proofAp0" value="0x23435871b25a4f174a60d6784f0b43de64b737a81abb1db9c76809a84a1ac3a3" placeholder=" proof A_p [0]" size="50"><br>
+            Proof A_p [1]
+            <br>
+            <input type="text" id="proofAp1" value="0x228c6ac7b695b85e1dc74e75091af2cc42167c53f125d69993d4a793f347ffcd" placeholder=" proof A_p [1]" size="50"><br>
+            Proof B [0][0]
+            <br>
+            <input type="text" id="proofB00" value="0x8485813e01227510b764ae2472ffa8d13f72d26799dccbf1c528efecaaf959d" placeholder=" proof B [0][0]" size="50"><br>
+            Proof B [0][1]
+            <br>
+            <input type="text" id="proofB01" value="0x1794ac8ed67fc5900f7f82c9629187c898e53f8e3bbd2dc72ec9606fa08b3ee9" placeholder=" proof B [0][1]" size="50"><br>
+            Proof B [1][0]
+            <br>
+            <input type="text" id="proofB10" value="0x1c3ca638de96fc168bbb9642cb2c33b2dc45f67114213fca5ccfbac87620de02" placeholder=" proof B [1][0]" size="50"><br>
+            Proof B [1][1]
+            <br>
+            <input type="text" id="proofB11" value="0x15f92c2f93f8c55ae016052c593e790d6c70a86d8ad99f5a6615518791ecd74" placeholder=" proof B [1][1]" size="50"><br>
+            Proof B_p [0]
+            <br>
+            <input type="text" id="proofBp0" value="0x2378e3dc7114c45731dd3313b917b9a62c3bb8680357ad39eaad852957887980" placeholder=" proof B_p [0]" size="50"><br>
+            Proof B_p [1]
+            <br>
+            <input type="text" id="proofBp1" value="0xe0e0a733bdc2978c24c064769acc6f315f73e68fb4ba7215bd95dba1431c213" placeholder=" proof B_p [1]" size="50"><br>
+            Proof C [0]
+            <br>
+            <input type="text" id="proofC0" value="0x1fcaf78696d2198be98611b6593056764af4d6c116ba3fdaa77161b8a43cd227" placeholder=" proof C [0]" size="50"><br>
+            Proof C [1]
+            <br>
+            <input type="text" id="proofC1" value="0x2e35496249128c8ace296f5b669dba4dab929865cf2ff3a8f4f5922da7d9e819" placeholder=" proof C [1]" size="50"><br>
+            Proof C_p [0]
+            <br>
+            <input type="text" id="proofCp0" value="0x18934dba627307ee07a454587d07be1388de56dc75f8a938933496d79f1aa498" placeholder=" proof C_p [0]" size="50"><br>
+            Proof C_p [1]
+            <br>
+            <input type="text" id="proofCp1" value="0x177964b89c55fba40bb4e532e866cdebb206a64a56a2b919470d9ca0ba34629e" placeholder=" proof C_p [1]" size="50"><br>
+            Proof H [0]
+            <br>
+            <input type="text" id="proofH0" value="0x15bde98590ca25782a5b3849beba4f7ddcc34ddbbfdbaf1ded7d5dead2e643fc" placeholder=" proof H [0]" size="50"><br>
+            Proof H [1]
+            <br>
+            <input type="text" id="proofH1" value="0x4e208cc7ee2705f08a5093ef909cb981e5fd7bb39f007428093bdcf9448cf6d" placeholder=" proof H [1]" size="50"><br>
+            Proof K [0]
+            <br>
+            <input type="text" id="proofK0" value="0x17cd8d18d07d1b0321387c711252e8e49d41bc6e879d5eec3517ec15ec662470" placeholder=" proof K [0]" size="50"><br>
+            Proof K [1]
+            <br>
+            <input type="text" id="proofK1" value="0x29bf6a058c573fa56a182330257996e7e7e7dabe0ceb50cd4162e53834067ea2" placeholder=" proof K [1]" size="50"><br>
+            Proof Input [0]
+            <br>
+            <input type="text" id="proofinput0" value="9" placeholder=" proof input [0]" size="50"><br>
+            Proof Input [1]
+            <br>
+            <input type="text" id="proofinput1" value="1" placeholder=" proof input [1]" size="50"><br>
+            <br>
+            <button class="btn-mine" type="button" data-id="3">Approve Solution</button>
+        </div>
+        <div class="form-break"></div>
+        <br>
+        <div class="form-group">
+            <h2>Mint Token with Approved Solution</h2>
+            Input [0]
+            <br>
+            <input type="text" id="mintsolutioninput0"  size="50"><br>
+            Input [1]
+            <input type="text" id="mintsolutioninput1" size="50"><br>
+            Address To
+            <br>
+            <input type="text" id="mintsolutionto" size="50"><br>
+            <button class="btn-markForPurchase" type="button" data-id="4">Mint with Solution</button>
+        </div>
+        <div class="form-break"></div>
+        <br>
+        <div class="form-group">
+            <h2>Mint Token without Approved Solution</h2>
+            To
+            <br>
+            <input type="text" id="mintto" size="50"><br>
+            <br>
+            Token ID
+            <br>
+            <input type="text" id="minttokenid" size="50"><br>
+            <br>
+            <button class="btn-markForPurchase" type="button" data-id="5">Mint</button>
+        </div>
+        <div class="form-break"></div>
+
+    </div>
+    <div class="container">
+        <h2>Transaction History<span id="ftc-history"></span></h2>
+        <div>
+            <ul id="ftc-events">
+                <!-- Events will appear here from app.js -->
+            </ul>
+            <br>
+            <hr>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- <script src="js/web3.min.js"></script> -->
+    <script src="dapp/js/truffle-contract.js"></script>
+    <script src="dapp/js/app.js"></script>
+    
+</body>
+
+</html>

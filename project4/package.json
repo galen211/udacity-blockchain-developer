@@ -12,7 +12,7 @@
     "dapp": "webpack-dev-server --mode development --config webpack.config.dapp.js",
     "dapp:prod": "webpack --mode production  --config webpack.config.dapp.js",
     "server": "rm -rf ./build/server && webpack --config webpack.config.server.js",
-    "server:dev" : "rm -rf ./build/server && webpack --mode development --config webpack.config.server.js"
+    "server:dev": "rm -rf ./build/server && webpack --mode development --config webpack.config.server.js"
   },
   "author": "Galen Simmons",
   "devDependencies": {
