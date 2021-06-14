@@ -1,6 +1,9 @@
 # FlightSurety
 <img src="../assets/undraw/project4.svg" width="200"/>
 
+## Video
+I made a video about this project linked here: https://vimeo.com/552011564
+
 ## Summary
 The FlightSurety application is a dApp that enables airlines to form a consortium to register flights, receive flight status updates from mock oracles, and make payouts to passengers who have purchased flight insurance.  The dApp separates data storage concerns from application logic that make the app possible to upgrade without re-deploying the data contract.
 
